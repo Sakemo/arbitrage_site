@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Surebet</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-color: #00FF43;
+            --success-color: #00FF43;
+            --error-color: #e76e6e;
+            --bg-color: #484C51;
+            --card-bg: #2F3237;
+            --text-color: #C2C4C8;
+            --border-color: rgba(0,255,67,0.18);
+            --border-radius: 12px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            width: 100%;
+            max-width: 500px;
+            padding: 2.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: 0 18px 38px rgba(0, 0, 0, 0.32);
+            border: 1px solid var(--border-color);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 1.6rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+
+        .calc-info {
+            background-color: rgba(0,255,67,0.08);
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            border: 1px solid rgba(0,255,67,0.18);
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .calc-info div {
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .calc-info strong {
+            color: #C2C4C8;
+        }
+
+        .calc-info span {
+            font-weight: 600;
+            color: var(--primary-color);
+            text-align: right;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+            font-size: 0.85rem;
+            color: #C2C4C8;
+            text-transform: uppercase;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            color: var(--text-color);
+            background-color: #1B1F24;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0,255,67,0.18);
+        }
+
+        button {
+            background-color: var(--success-color);
+            color: #101217;
+            padding: 14px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            margin-top: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        button:hover {
+            background-color: #66ff7a;
+            transform: translateY(-1px);
+        }
+
+        .calc-resultado {
+            margin-top: 1.5rem;
+            padding: 1.2rem;
+            border-radius: var(--border-radius);
+            background-color: rgba(0,0,0,0.18);
+            border: 1px solid rgba(0,255,67,0.18);
+            text-align: center;
+            display: none;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .calc-resultado.success {
+            background-color: rgba(0,255,67,0.09);
+            border-color: rgba(0,255,67,0.28);
+            color: #d8ffe0;
+        }
+
+        .calc-resultado.error {
+            background-color: rgba(231,110,110,0.12);
+            border-color: rgba(231,110,110,0.3);
+            color: #ffbcbe;
+        }
+
+        .calc-resultado h2 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .result-line {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+            border-bottom: 1px dashed rgba(255,255,255,0.08);
+            padding-bottom: 4px;
+        }
+
+        .result-profit {
+            margin-top: 15px;
+            font-weight: 800;
+            font-size: 1.3rem;
+            padding: 10px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 6px;
+        }
+
+        .odds-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .odds-row .input-group {
+            flex: 1;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1><i class="fas fa-calculator"></i> Calculadora Surebet</h1>
+
+        <div class="calc-info">
+            <div><strong>Evento:</strong> <span id="info-evento">{{ evento }}</span></div>
+            <div><strong>Mercado:</strong> <span id="info-mercado">{{ mercado }}</span></div>
+            <div><strong>Ref:</strong> <span id="info-chance">{{ chance }}</span></div>
+        </div>
+
+        <form id="surebet-form" onsubmit="event.preventDefault(); calcularSurebet();">
+            
+            <div class="odds-row">
+                <div class="input-group">
+                    <label for="odd1">Odd 1</label>
+                    <input type="number" id="odd1" step="0.01" required value="{{ odd1 or '' }}" placeholder="0.00">
+                </div>
+
+                <div class="input-group">
+                    <label for="odd2">Odd 2</label>
+                    <input type="number" id="odd2" step="0.01" required value="{{ odd2 or '' }}" placeholder="0.00">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="odd3">Odd 3 (Opcional)</label>
+                <input type="number" id="odd3" step="0.01" value="{{ odd3 or '' }}" placeholder="Deixe vazio se não houver">
+            </div>
+
+            <div class="input-group">
+                <label for="stake">Investimento Total (R$)</label>
+                <input type="number" id="stake" step="0.01" required value="100" placeholder="Ex: 100.00">
+            </div>
+
+            <button type="button" onclick="calcularSurebet()">Calcular Retornos</button>
+        </form>
+
+        <div id="resultado-box" class="calc-resultado">
+            <div id="resultado"></div>
+        </div>
+    </div>
+
+    <script>
+        function calcularSurebet() {
+            const getVal = (id) => {
+                let val = document.getElementById(id).value;
+                return val ? parseFloat(val.replace(',', '.')) : 0;
+            };
+
+            let odd1 = getVal("odd1");
+            let odd2 = getVal("odd2");
+            let odd3 = getVal("odd3");
+            let stake = getVal("stake");
+
+            const resultBox = document.getElementById("resultado-box");
+            const resultText = document.getElementById("resultado");
+
+            if (odd1 > 1 && odd2 > 1 && stake > 0) {
+                let inv1 = 1 / odd1;
+                let inv2 = 1 / odd2;
+                let inv3 = odd3 > 1 ? 1 / odd3 : 0;
+
+                let totalInverse = inv1 + inv2 + inv3;
+
+                if (totalInverse < 1) {
+                    let stake1 = (stake * inv1) / totalInverse;
+                    let stake2 = (stake * inv2) / totalInverse;
+                    let stake3 = odd3 > 1 ? (stake * inv3) / totalInverse : 0;
+
+                    let profit = stake * (1 - totalInverse) / totalInverse;
+                    let profitPercent = ((1 - totalInverse) / totalInverse) * 100;
+
+                    let html = `
+                        <h2><i class="fas fa-check-circle"></i> Oportunidade!</h2>
+                        <div class="result-line"><span>Aposta 1 (@${odd1}):</span> <strong>R$ ${stake1.toFixed(2)}</strong></div>
+                        <div class="result-line"><span>Aposta 2 (@${odd2}):</span> <strong>R$ ${stake2.toFixed(2)}</strong></div>
+                    `;
+
+                    if (odd3 > 1) {
+                        html += `<div class="result-line"><span>Aposta 3 (@${odd3}):</span> <strong>R$ ${stake3.toFixed(2)}</strong></div>`;
+                    }
+
+                    html += `<div class="result-profit">Lucro: R$ ${profit.toFixed(2)} <small>(${profitPercent.toFixed(2)}%)</small></div>`;
+
+                    resultText.innerHTML = html;
+                    resultBox.className = "calc-resultado success";
+                    resultBox.style.display = "block";
+                } else {
+                    let lossVal = stake - (stake / totalInverse);
+
+                    resultText.innerHTML = `
+                        <h2><i class="fas fa-times-circle"></i> Sem Lucro</h2>
+                        <p>As odds atuais não garantem lucro.</p>
+                        <p style="margin-top:10px; font-weight:bold;">Prejuízo estimado: R$ ${Math.abs(lossVal).toFixed(2)}</p>
+                    `;
+                    resultBox.className = "calc-resultado error";
+                    resultBox.style.display = "block";
+                }
+            } else {
+                resultText.innerHTML = "<strong>⚠️ Atenção:</strong> Preencha o valor total e pelo menos as duas primeiras Odds.";
+                resultBox.className = "calc-resultado error";
+                resultBox.style.display = "block";
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if(document.getElementById("odd1").value && document.getElementById("odd2").value) {
+                calcularSurebet();
+            }
+        });
+    </script>
+</body>
+</html>

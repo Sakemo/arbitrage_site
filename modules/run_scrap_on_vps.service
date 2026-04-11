@@ -1,0 +1,15 @@
+[Unit]
+Description=Run scrap on VPS
+After=network.target gunicorn_surebet.service
+Requires=gunicorn_surebet.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/sites/flask_surebet
+ExecStart=/root/sites/flask_surebet/venv/bin/python /root/sites/flask_surebet/modules/run_scrap_on_vps.py
+Restart=on-failure
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target

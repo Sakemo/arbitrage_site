@@ -1,0 +1,365 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Gerenciar Usuários {% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"> 
+
+<style>
+    :root {
+        --sb-bg-main: #484C51;
+        --sb-bg-card: #2F3237;
+        --sb-input: #1B1F24;
+        --sb-border: rgba(0,255,67,0.18);
+        --sb-text: #C2C4C8;
+        --sb-muted: #AAB0B6;
+        --sb-accent: #00FF43;
+    }
+
+    body {
+        color: var(--sb-text) !important;
+        background-color: var(--sb-bg-main) !important;
+    }
+
+    h2, h3, h4, h5 {
+        color: var(--sb-accent) !important;
+        font-weight: 700;
+    }
+
+    .card {
+        background-color: var(--sb-bg-card) !important;
+        border: 1px solid var(--sb-border) !important;
+        box-shadow: 0 10px 28px rgba(0,0,0,0.22) !important;
+        border-radius: 1rem;
+    }
+    .card-body { padding: 20px; }
+
+    .form-control {
+        background-color: var(--sb-input) !important;
+        color: var(--sb-text) !important;
+        border: 1px solid var(--sb-border) !important;
+        border-radius: 0.75rem;
+        height: 44px;
+    }
+    .form-control:focus {
+        border-color: var(--sb-accent) !important;
+        box-shadow: 0 0 0 0.2rem rgba(0,255,67,0.16) !important;
+    }
+    label {
+        color: var(--sb-text) !important;
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+
+    .btn-add-user {
+        background-color: rgba(0,255,67,0.18);
+        color: var(--sb-text);
+        border: 1px solid rgba(0,255,67,0.3);
+        font-weight: 600;
+        padding: 10px 20px;
+        border-radius: 0.85rem;
+    }
+    .btn-add-user:hover { background-color: var(--sb-accent); color: #101217; }
+
+    .btn-search {
+        background-color: rgba(0,255,67,0.18);
+        color: var(--sb-text);
+        border: 1px solid rgba(0,255,67,0.3);
+        border-radius: 0.85rem;
+        width: 100%;
+        height: 40px;
+    }
+    .btn-search:hover { background-color: var(--sb-accent); color: #101217; }
+
+    .btn-action-edit { color: var(--sb-accent); background: transparent; border: none; font-size: 1.2rem; cursor: pointer; }
+    .btn-action-delete { color: #f98f8f; background: transparent; border: none; font-size: 1.2rem; cursor: pointer; }
+
+    .operation-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 1rem;
+        background-color: transparent;
+    }
+
+    .operation-table thead {
+        background-color: rgba(0,255,67,0.08);
+        border-bottom: 2px solid rgba(0,255,67,0.18);
+    }
+    .operation-table th {
+        padding: 15px;
+        color: var(--sb-accent);
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        text-align: center;
+    }
+    .operation-table td {
+        padding: 12px;
+        vertical-align: middle;
+        border-top: 1px solid rgba(0,255,67,0.12);
+        text-align: center;
+        color: var(--sb-text);
+    }
+
+    .operation-table tr {
+        margin-bottom: 15px;
+        background-color: rgba(255,255,255,0.02);
+        border: 1px solid rgba(0,255,67,0.12);
+        border-radius: 0.95rem;
+        box-shadow: 0 10px 24px rgba(0,0,0,0.16);
+        padding: 15px;
+    }
+
+    .operation-table td {
+        text-align: center;
+    }
+
+    @media (max-width: 991.98px) {
+        .operation-table thead {
+            display: none;
+        }
+
+        .operation-table, .operation-table tbody, .operation-table tr, .operation-table td {
+            display: block;
+            width: 100%;
+        }
+
+        .operation-table tr {
+            padding: 15px;
+        }
+
+        .operation-table td {
+            text-align: right;
+            padding-left: 50%;
+            position: relative;
+            border: none;
+            border-bottom: 1px dashed rgba(0,255,67,0.14);
+            padding: 10px 0;
+        }
+
+        .operation-table td:last-child {
+            border-bottom: none;
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+        }
+
+        .operation-table td::before {
+            content: attr(data-label);
+            position: absolute;
+            left: 0;
+            width: 45%;
+            padding-right: 10px;
+            white-space: nowrap;
+            text-align: left;
+            font-weight: 700;
+            color: var(--sb-muted);
+        }
+    }
+
+    .modal-content {
+        background-color: var(--sb-bg-card);
+        color: var(--sb-text);
+        border: 1px solid var(--sb-border);
+        border-radius: 1rem;
+        box-shadow: 0 18px 38px rgba(0,0,0,0.25);
+    }
+    .modal-header {
+        border-bottom: 1px solid rgba(0,255,67,0.14);
+        background-color: rgba(0,255,67,0.08);
+        color: var(--sb-text);
+    }
+    .modal-footer { border-top: 1px solid rgba(0,255,67,0.14); }
+    .close { color: var(--sb-text); opacity: 0.85; }
+    .close:hover { color: #ffffff; opacity: 1; }
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
+<div class="content">
+    <div class="container mt-5">
+        
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="fas fa-users-cog mr-2"></i> Gerenciar Usuários</h2>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="row align-items-end mb-4">
+                    <div class="col-md-6 mb-3 mb-md-0">
+                        <label for="searchUsername">Procurar usuário</label>
+                        <input type="text" id="searchUsername" class="form-control" placeholder="Digite o username...">
+                    </div>
+                    <div class="col-md-2 mb-3 mb-md-0">
+                        <button onclick="searchUser()" class="btn btn-search">
+                            <i class="fas fa-search"></i> Buscar
+                        </button>
+                    </div>
+                    <div class="col-md-4 text-md-right text-left">
+                        <button type="button" class="btn btn-add-user w-100 w-md-auto" data-toggle="modal" data-target="#addUserModal">
+                            <i class="fas fa-plus mr-2"></i> Novo Usuário
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-responsive-wrapper"> <table class="table operation-table">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Admin</th>
+                                <th>Data de Expiração</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            </tbody>   
+                    </table>
+                    
+                    <div id="no-users" class="text-center mt-5 mb-3 text-muted" style="display:none;">
+                        <h4><i class="fas fa-search-minus mb-2" style="font-size: 2rem;"></i><br>Nenhum usuário encontrado.</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addUserModal" tabindex="-1" role="dialog" aria-labelledby="addUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addUserModalLabel">Adicionar Novo Usuário</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" id="addUserForm">
+                    <div class="form-group mb-3">
+                        <label for="addusername">Username</label>
+                        <input type="text" id="addusername" name="addusername" class="form-control" required placeholder="Ex: usuario123">
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="addpassword">Senha</label>
+                        <input type="password" id="addpassword" name="addpassword" class="form-control" required placeholder="******">
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="adddate_expiry">Data de Expiração</label>
+                        <input type="date" id="adddate_expiry" name="adddate_expiry" class="form-control">
+                    </div>
+                    <div class="text-right mt-4">
+                        <button type="button" class="btn btn-secondary mr-2" data-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-add-user">Salvar Usuário</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+{% block javascripts %}
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script>
+    async function loadUsers(searchTerm = null) {
+        const baseUrl = window.location.origin;
+        let endpoint = baseUrl + '/get_users';
+        if (searchTerm) {
+            endpoint += `?search=${searchTerm}`;
+        }
+        
+        try {
+            const response = await fetch(endpoint);
+            const users = await response.json();
+            const usersTableBody = document.querySelector('.table tbody');
+            usersTableBody.innerHTML = "";
+
+            if (users.length === 0) {
+                document.getElementById('no-users').style.display = 'block';
+            } else {
+                document.getElementById('no-users').style.display = 'none';
+                users.forEach(user => {
+                    let expiryDate = '<span class="badge badge-success">Permanente</span>';
+                    if (user.date_expiry) {
+                        const date = new Date(user.date_expiry);
+                        const utcDate = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
+                        expiryDate = utcDate.toLocaleDateString('pt-BR');
+                    }
+                    
+                    const adminBadge = user.is_admin 
+                        ? '<span class="badge badge-primary">SIM</span>' 
+                        : '<span class="badge badge-secondary">NÃO</span>'; 
+
+                    // NOTA: Adicionei data-label="" para o modo responsivo funcionar
+                    usersTableBody.innerHTML += `
+                        <tr>
+                            <td data-label="Username" class="font-weight-bold" style="font-size:1.05rem;">${user.username}</td>
+                            <td data-label="Admin">${adminBadge}</td>
+                            <td data-label="Expiração">${expiryDate}</td>
+                            <td data-label="Ações">
+                                <button onclick="window.location.href='${baseUrl}/edit_user/${user.id}'" class="btn-action-edit mr-3" title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button onclick="deleteUser('${user.id}', '${user.username}')" class="btn-action-delete" title="Remover">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+        } catch (error) {
+            console.error("Erro ao carregar usuários:", error);
+        }
+    }
+
+    function searchUser() {
+        const searchTerm = document.getElementById('searchUsername').value;
+        loadUsers(searchTerm);
+    }
+
+    document.getElementById('addUserForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const username = document.getElementById('addusername').value;
+        const password = document.getElementById('addpassword').value;
+        const date_expiry = document.getElementById('adddate_expiry').value;
+        const baseUrl = window.location.origin;
+        
+        const response = await fetch(baseUrl + '/add_user', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password, date_expiry })
+        });
+        const result = await response.json();
+
+        swal("Aviso", result.message, result.success ? "success" : "info");
+        $('#addUserModal').modal('hide');
+        loadUsers();
+        this.reset();
+    });
+
+    async function deleteUser(userId, username) {
+        swal({
+            title: "Tem certeza?",
+            text: "Deseja excluir o usuário: " + username + "?",
+            icon: "warning",
+            buttons: ["Cancelar", "Sim, excluir"],
+            dangerMode: true,
+        })
+        .then(async (willDelete) => {
+            if (willDelete) {
+                const baseUrl = window.location.origin;
+                const response = await fetch(`${baseUrl}/delete_user/${userId}`, { method: 'DELETE' });
+                const result = await response.json();
+                swal("Usuário excluído!", { icon: "success" });
+                loadUsers();
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        loadUsers();
+    });
+</script>
+{% endblock javascripts %}

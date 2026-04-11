@@ -1,0 +1,821 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Surebet Dashboard {% endblock title %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"> 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+<link rel="stylesheet" href="{{ url_for('static', filename='assets/css/custom-styles.css') }}">
+
+<style>
+    :root {
+        --sb-bg-main: #484C51;
+        --sb-card: #2F3237;
+        --sb-surface: #393f44;
+        --sb-input: #1B1F24;
+        --sb-text: #C2C4C8;
+        --sb-muted: #AAB0B6;
+        --sb-border: rgba(0,255,67,0.18);
+        --sb-accent: #00FF43;
+        --sb-link: #C2C4C8;
+    }
+
+    body, .wrapper, .main-panel, .content {
+        background-color: var(--sb-bg-main) !important;
+        color: var(--sb-text) !important;
+        font-size: 0.95rem !important;
+    }
+
+    .card, .sb-list-row {
+        padding: 4px;
+        background-color: var(--sb-card) !important;
+        border: 1px solid var(--sb-border) !important;
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.25) !important;
+        border-radius: 0.5rem !important;
+    }
+
+    .sb-list-header {
+        display: flex;
+        align-items: center;
+        background-color: transparent !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+        color: var(--sb-muted) !important;
+        font-weight: 600;
+        padding: 10px 15px;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 1px;
+    }
+
+
+    .card-header {
+        background-color: var(--sb-surface) !important;
+        color: var(--sb-text) !important;
+        font-weight: 600;
+    }
+
+    .form-control, select, input {
+        background-color: var(--sb-input) !important;
+        color: var(--sb-text) !important;
+        border: 1px solid var(--sb-border) !important;
+    }
+
+    .choices__inner {
+        background-color: var(--sb-input) !important;
+        border: none !important;
+        box-shadow: none !important;
+        border-radius: 0.75rem !important;
+        min-height: 42px;
+    }
+    .choices__inner.is-focused, .choices__inner:focus {
+        outline: none !important;
+        box-shadow: none !important;
+    }
+    .choices__list--dropdown {
+        background-color: var(--sb-input) !important;
+        border: 1px solid var(--sb-border) !important;
+        z-index: 1050;
+    }
+    .choices__list--multiple .choices__item {
+        background-color: rgba(0,255,67,0.15) !important;
+        border: 1px solid rgba(0,255,67,0.3) !important;
+        color: var(--sb-text) !important;
+        border-radius: 0.65rem;
+    }
+    .choices__list--multiple .choices__item .choices__button {
+        border-left: 1px solid rgba(255,255,255,0.2) !important;
+        margin: 0 -4px 0 8px;
+    }
+    .choices__list--dropdown .choices__item--selectable.is-highlighted {
+        background-color: rgba(0,255,67,0.12) !important;
+        color: #ffffff !important;
+    }
+
+    .btn-filter-apply {
+        background-color: rgba(0,255,67,0.18) !important;
+        color: var(--sb-text) !important;
+        font-weight: 600;
+        border: 1px solid rgba(0,255,67,0.3) !important;
+        transition: background 0.2s;
+    }
+    .btn-filter-apply:hover { background-color: rgba(0,255,67,0.25) !important; }
+    
+    .btn-filter-clear {
+        background-color: transparent !important;
+        border: 1px solid rgba(255,255,255,0.12) !important;
+        color: var(--sb-text) !important;
+        font-weight: 600;
+    }
+
+    .sb-col-profit { flex: 0 0 90px; text-align: center; }
+    .sb-profit-val { font-size: 1.2rem; font-weight: 700; color: var(--sb-accent); }
+    .sb-age-val { font-size: 0.75rem; color: var(--sb-muted); }
+
+    .sb-col-bookmakers { flex: 0 0 140px; padding-left: 15px; }
+    .sb-bookmaker-item a { color: var(--sb-text); text-decoration: none; }
+    .sb-bookmaker-item a:hover { color: var(--sb-accent); }
+
+    .sb-col-event { flex: 2; padding-left: 20px; }
+    .sb-event-time { font-size: 0.8rem; color: #ffffff; opacity: 0.78; margin-bottom: 2px; }
+    
+    .sb-event-link { 
+        font-weight: 600; 
+        color: var(--sb-accent) !important; 
+        font-size: 1rem; 
+        text-decoration: none; 
+    }
+    .sb-event-link:hover { text-decoration: underline; color: #d8ffe0 !important; }
+    
+    .sb-event-league { font-size: 0.85rem; color: #ffffff; margin-top: 2px; font-weight: normal !important; opacity: 0.85; }
+
+    .sb-list-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: #ffffff;
+        padding: 12px 16px;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+
+    .sb-col-profit {
+        flex: 0 0 82px;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: #ffffff;
+    }
+
+    .sb-col-bookmakers,
+    .sb-col-market,
+    .sb-col-odds,
+    .sb-col-event {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: #ffffff;
+        gap: 4px;
+    }
+
+    .sb-col-bookmakers {
+        flex: 0 0 120px;
+        padding-left: 0;
+    }
+
+    .sb-col-bookmakers a {
+        color: #ffffff !important;
+    }
+
+    .sb-col-market { flex: 1; color: #ffffff; font-weight: 500; }
+    .sb-col-odds { flex: 1; color: #ffffff; }
+    
+    .sb-market-item {
+        margin-bottom: 4px;
+        color: #ffffff;
+    }
+
+    .sb-odd-link {
+        display: inline-block;
+        padding: 6px 10px;
+        background-color: rgba(0,255,67,0.15) !important;
+        color: var(--sb-accent) !important;
+        font-weight: 700;
+        border-radius: 0.75rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        margin-bottom: 4px;
+        text-decoration: none !important;
+        border: 1px solid rgba(0,255,67,0.28);
+    }
+    .sb-odd-link:hover {
+        background-color: var(--sb-accent) !important;
+        color: #101217 !important;
+    }
+
+    #loading-spinner .spinner-border { color: var(--sb-accent) !important; }
+    #loading-message { color: var(--sb-muted); font-weight: 500; }
+
+    .custom-modal { background: rgba(0,0,0,0.65); backdrop-filter: blur(2px); }
+    .custom-modal-content { background: var(--sb-card); border-radius: 1rem; border: 1px solid rgba(0,255,67,0.22); color: var(--sb-text); }
+    .calculator-modal-title { color: var(--sb-accent); }
+    .close-modal-btn { color: var(--sb-muted); display: flex; justify-content: flex-end; }
+    .close-modal-btn:hover { color: #ffffff; }
+
+    @media (max-width: 991px) {
+        .sb-list-header { display: none; }
+        .sb-list-row { flex-direction: column; padding: 20px; margin-bottom: 15px; border: 1px solid rgba(0,255,67,0.15); border-radius: 1rem; box-shadow: 0 10px 24px rgba(0,0,0,0.2); }
+        .sb-col-profit { text-align: left; margin-bottom: 15px; border-bottom: 1px solid rgba(0,255,67,0.16); padding-bottom: 10px; width: 100%; display: flex; justify-content: space-between; align-items: center; }
+        .sb-col-profit::after { content: 'Lucro'; color: var(--sb-muted); font-size: 0.9rem; }
+        .sb-col-event { padding-left: 0; margin-bottom: 15px; }
+        .sb-col-bookmakers, .sb-col-market, .sb-col-odds { padding: 0; text-align: left; width: 100%; display: flex; justify-content: space-between; margin-bottom: 5px; border-bottom: 1px dashed rgba(0,255,67,0.16); padding-bottom: 5px; }
+    }
+
+    .sb-banner-info {
+        background: rgba(0,255,67,0.1) !important;
+        border: 1px solid rgba(0,255,67,0.2) !important;
+        color: var(--sb-text) !important;
+        padding: 15px;
+        border-radius: 0.85rem;
+    }
+
+    .sidebar-filters .card-body {
+        background-color: var(--sb-card) !important;
+    }
+
+    .sport-icon {
+        font-size: 1.5rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 6px;
+    }
+    .sidebar-filters label { color: var(--sb-text) !important; }
+
+    .head-profit { flex: 0 0 80px; text-align: center; margin-right: 15px; }
+    .head-event { flex: 1; text-align: center; }
+    .head-odds { flex: 0 0 280px; text-align: center; }
+
+    .sb-list-row {
+        display: flex;
+        align-items: center;
+        background: var(--sb-card);
+        margin-bottom: 4px; /* Mais compacto */
+        padding: 6px 15px;
+        border-radius: 4px !important; /* Border radius reduzido pela metade */
+        border: 1px solid var(--sb-border);
+    }
+
+    .profit-badge {
+        color: var(--sb-accent);
+        font-weight: 800;
+        font-size: 1rem;
+    }
+
+    .sb-odd-link{
+        border-radius: 3px !important;
+        font-size: 0.8rem;
+    }
+
+    .compact-odd-row{
+        border-radius: 2px !important;
+        gap: 8px;
+    }
+    
+    .sb-grid-layout {
+    display: grid;
+    grid-template-columns: 100px 1fr 50px 320px;
+    align-items: center;
+    gap: 20px;
+    padding: 10px 20px;
+}
+
+    /* CABEÇALHO */
+    .sb-list-header {
+        background-color: transparent !important;
+        border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+        color: var(--sb-muted) !important;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.7rem;
+        letter-spacing: 1px;
+    }
+
+    /* CARD DE APOSTA */
+    .sb-list-row {
+        background: var(--sb-card);
+        margin-bottom: 6px;
+        border-radius: 4px !important; /* Border radius reduzido */
+        border: 1px solid var(--sb-border);
+        transition: all 0.2s;
+    }
+    .sb-list-row:hover {
+        border-color: rgba(0,255,67,0.3);
+        background: #363a3f !important;
+    }
+
+    /* Coluna 1: Lucro */
+    .sb-col-profit {
+        text-align: left;
+    }
+    .profit-badge {
+        color: var(--sb-accent);
+        font-weight: 800;
+        font-size: 1.1rem;
+        line-height: 1;
+    }
+    .sport-label {
+        font-size: 0.6rem;
+        text-transform: uppercase;
+        color: var(--sb-muted);
+        font-weight: bold;
+    }
+
+    /* Coluna 2: Informações do Evento (Alinhado à Esquerda) */
+    .sb-col-event-info {
+        text-align: left;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+    .event-time-row {
+        font-size: 0.7rem;
+        color: var(--sb-muted);
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        margin-bottom: 2px;
+    }
+    .event-title-link {
+        font-weight: 600;
+        color: #FFFFFF !important;
+        text-decoration: none;
+        font-size: 1rem;
+        line-height: 1.2;
+    }
+    .event-league {
+        font-size: 0.75rem;
+        color: #777;
+    }
+
+    /* Coluna 3: Odds */
+    .sb-col-odds-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+    .compact-odd-row {
+        display: grid;
+        grid-template-columns: 80px 1fr 60px;
+        background: rgba(0,0,0,0.2);
+        padding: 3px 10px;
+        border-radius: 3px;
+        gap: 10px;
+    }
+    .bkm-name { font-size: 0.7rem; color: #aaa; font-weight: bold; }
+    .mkt-name { font-size: 0.7rem; color: #666; text-align: left; }
+    .sb-odd-link {
+        background: rgba(0,255,67,0.1);
+        color: var(--sb-accent) !important;
+        padding: 2px 5px;
+        border-radius: 3px;
+        font-weight: bold;
+        font-size: 0.8rem;
+        text-align: center;
+        border: 1px solid rgba(0,255,67,0.2);
+    }
+
+    .sb-col-action{
+        align-items: center;
+        margin: auto;
+    }
+    
+    /* BOTÃO FANTASMA - Estilo Premium */
+    .btn-ghost-calc {
+        background: transparent !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        color: var(--sb-muted) !important;
+        width: 38px;
+        height: 34px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px !important;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .btn-ghost-calc:hover {
+        border-color: var(--sb-accent) !important;
+        color: var(--sb-accent) !important;
+        background: rgba(0, 255, 67, 0.05) !important;
+        transform: translateY(-1px);
+    }
+
+    /* O link do evento agora é apenas texto clicável para a casa */
+    .event-title-link {
+        font-weight: 600;
+        color: #FFFFFF !important;
+        text-decoration: none;
+        font-size: 0.95rem;
+    }
+    .event-title-link:hover {
+        text-decoration: underline;
+    }
+    </style>
+{% endblock stylesheets %}
+
+{% block content %}
+<div class="content container-fluid">
+    <div class="row mb-3">
+        <div class="col-12">
+                <div class="sb-banner-info">
+                <i class="fas fa-info-circle mr-2"></i> Encontradas milhares de apostas seguras.
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-9 order-lg-1 order-2">
+             <div id="loading-spinner" class="text-center pt-5">
+                <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;"></div>
+                <p class="text-center mt-3 text-muted">Procurando oportunidades...</p>
+            </div>
+
+            <div id="betting-signals-container" class="betting-signals-container" style="display: none;">
+                <div class="sb-list-header d-none d-lg-flex">
+    <div style="text-align: left;">Lucro</div>
+    <div style="text-align: left;">Evento / Competição</div>
+    <div style="text-align: right;">Casa / Mercado / Odds</div>
+                </div>
+                <ul class="betting-signals list-unstyled m-0 p-0" id="betting-signals"></ul>
+            </div>
+        </div>
+
+        <div class="col-lg-3 order-lg-2 order-1 mb-4">
+            <div class="sidebar-filters">
+                <div class="card border-0">
+                    <div class="card-header"><i class="fas fa-filter mr-2"></i> FILTROS</div>
+                    <div class="card-body">
+                        <form id="filter-form">
+                            <div class="form-group mb-3">
+                                <label style="color: #ffffff;">Casas de Apostas</label>
+                                <select id="bookmaker-filter" class="form-control" name="bookmakers" multiple></select>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label style="color: #ffffff;">Esportes</label>
+                                <select id="sport-filter" class="form-control" multiple></select>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label style="color: #ffffff;">Data Máxima</label>
+                                <input type="date" id="date-filter" class="form-control">
+                            </div>
+                            <div class="form-group mb-3">
+                                <label style="color: #ffffff;">Lucro Mínimo (%)</label>
+                                <input type="number" id="profit-filter" class="form-control" step="0.01" placeholder="Ex: 1.0">
+                            </div>
+                            <div class="form-group mb-4">
+                                <label style="color: #ffffff;">Ordenar por</label>
+                                <select id="sort-filter" class="form-control">
+                                    <option value="desc">Maior Lucro</option>
+                                    <option value="asc">Mais Recente</option>
+                                </select>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button type="button" id="apply-filters" class="btn btn-filter-apply btn-block w-100 p-2">Aplicar</button>
+                                <button type="button" id="clear-filters" class="btn btn-filter-clear btn-block w-100 mt-2 p-2" style="color: #fff;">Limpar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> 
+</div>
+
+{% include 'components/calculadora_modal.html' %}
+
+{% endblock content %}
+
+{% block javascripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
+<script>
+    // --- VARIÁVEIS GLOBAIS ---
+    let currentFilters = { bookmaker: [], sport: [], date: '', min_profit: '', sort: 'desc' };
+    let currentPage = 1, lastPage = false, isLoading = false, infiniteData = [];
+    let bookmakerChoices, sportChoices;
+
+    function formatDateToDDMM(dateStr) {
+        if (!dateStr) return '';
+        const [yyyy, mm, dd] = dateStr.split('-');
+        return `${dd}/${mm}`;
+    }
+
+    function sportIcon(name) {
+        const value = (name || '').toLowerCase();
+        if (value.includes('american football') || value.includes('nfl')) return '🏈';
+        if (value.includes('futebol') || value.includes('football')) return '⚽';
+        if (value.includes('tênis') || value.includes('tenis') || value.includes('tennis')) return '🎾';
+        if (value.includes('basquete') || value.includes('basketball')) return '🏀';
+        if (value.includes('cavalo') || value.includes('horse racing')) return '🏇';
+        if (value.includes('rugby')) return '🏉';
+        if (value.includes('beisebol') || value.includes('baseball')) return '⚾';
+        if (value.includes('volei') || value.includes('volleyball')) return '🏐';
+        if (value.includes('hockey') || value.includes('hóquei')) return '🏒';
+        if (value.includes('cricket')) return '🏏';
+        if (value.includes('formula') || value.includes('f1')) return '🏎️';
+        if (value.includes('motogp') || value.includes('moto')) return '🏍️';
+        return '🏅';
+    }
+
+    // --- CORREÇÃO CRÍTICA: MOVER MODAL PARA O BODY ---
+    // Isso impede que o modal fique preso dentro dos cards ou bugue o layout
+    document.addEventListener("DOMContentLoaded", function() {
+        console.log(`%c========================================`,'color: #999; font-size: 10px;');
+        console.log(`%c🟢 SureBet Dashboard Loaded - Ready to Display Data`,'color: #00aa00; font-weight: bold; font-size: 13px;');
+        console.log(`%c========================================`,'color: #999; font-size: 10px;');
+        
+        const modalElement = document.getElementById('calc-modal');
+        if (modalElement) {
+            document.body.appendChild(modalElement);
+        }
+        console.log(`%c[INIT] Loading filter options from /api/filters...`, 'color: #ff9900; font-weight: bold; font-size: 11px;');
+        loadFilterOptions(); // Carrega filtros após mover o modal
+    });
+
+    async function fetchOpportunities(page = 1, append = false) {
+        if (isLoading && page !== 1) return;
+        isLoading = true;
+        if(!append) {
+             document.getElementById('loading-spinner').style.display = 'block';
+             document.getElementById('betting-signals-container').style.display = 'none';
+        }
+
+        const params = new URLSearchParams();
+        currentFilters.bookmaker.forEach(b => params.append('bookmaker', b));
+        currentFilters.sport.forEach(s => params.append('sport', s));
+        if (currentFilters.date) params.append('date', currentFilters.date);
+        if (currentFilters.min_profit) params.append('min_profit', currentFilters.min_profit);
+        params.append('sort', currentFilters.sort);
+        params.append('page', page);
+        params.append('per_page', 20);
+        
+        console.log(`%c[FETCH] Page ${page} | Filters: ${params.toString().substring(0, 80)}...`,
+            'color: #6600ff; font-weight: bold; font-size: 10px;');
+        
+        try {
+            const response = await fetch(`/api/opportunities?${params.toString()}`);
+            const data = await response.json();
+
+            if (append) {
+                infiniteData = infiniteData.concat(data.items);
+            } else {
+                infiniteData = data.items;
+            }
+            lastPage = !data.has_next;
+            currentPage = data.page;
+            
+            // Log data source type with detailed breakdown
+            if (infiniteData.length > 0) {
+                const dataSource = {};
+                infiniteData.forEach(item => {
+                    const source = item.age || 'unknown';
+                    dataSource[source] = (dataSource[source] || 0) + 1;
+                });
+                
+                const sourceList = Object.entries(dataSource)
+                    .map(([source, count]) => {
+                        if (source === 'betfair-api') return `🟢 ${count}x BETFAIR API`;
+                        return `🔵 ${count}x PLACEHOLDER`;
+                    })
+                    .join(' | ');
+                
+                console.log(`%c[SCRAPING DATA] Loaded ${infiniteData.length} opportunities ➤ ${sourceList}`, 
+                    'color: #00aa00; font-weight: bold; font-size: 12px;');
+                console.log(`%c[DATA DETAILS]`, 'color: #00aa00; font-weight: bold; font-size: 11px;');
+                infiniteData.forEach((item, idx) => {
+                    const bookmakers = [item.bookmaker1, item.bookmaker2, item.bookmaker3].filter(b => b).join(', ');
+                    const odds = [item.odds1, item.odds2, item.odds3].filter(o => o).map(o => parseFloat(o).toFixed(2)).join(' | ');
+                    const source = item.age === 'betfair-api' ? '🟢' : '🔵';
+                    console.log(`  ${source} [${idx+1}] ${item.event1} (${item.league1}) | Profit: ${item.profit}% | Bookmakers: ${bookmakers} | Odds: ${odds}`);
+                });
+            }
+            
+            displayOpportunities(infiniteData);
+        } catch (err) { console.error('❌ Error fetching opportunities:', err); }
+        
+        isLoading = false;
+        document.getElementById('loading-spinner').style.display = 'none';
+        document.getElementById('betting-signals-container').style.display = 'block';
+        if (infiniteData.length === 0) {
+            document.getElementById('betting-signals').innerHTML = '<li class="p-5 text-center text-muted"><h4>Nenhuma aposta encontrada.</h4></li>';
+        }
+    }
+
+    async function applyFilters() {
+        const selectedBookmakers = bookmakerChoices ? bookmakerChoices.getValue(true) : [];
+        const selectedSports = sportChoices ? sportChoices.getValue(true) : [];
+
+        currentFilters = {
+            bookmaker: selectedBookmakers,
+            sport: selectedSports,
+            date: document.getElementById('date-filter').value,
+            min_profit: document.getElementById('profit-filter').value,
+            sort: document.getElementById('sort-filter').value
+        };
+        
+        console.log(`%c[FILTERS] Applied: Bookmakers=[${selectedBookmakers.join(', ')}] | Sports=[${selectedSports.join(', ')}] | MinProfit=${currentFilters.min_profit}% | Sort=${currentFilters.sort}`,
+            'color: #0099ff; font-weight: bold; font-size: 11px;');
+        
+        currentPage = 1;
+        lastPage = false;
+        infiniteData = [];
+        await fetchOpportunities(1, false);
+    }
+    
+    function clearFilters() {
+        if(bookmakerChoices) bookmakerChoices.removeActiveItems();
+        if(sportChoices) sportChoices.removeActiveItems();
+        document.getElementById('date-filter').value = '';
+        document.getElementById('profit-filter').value = '';
+        document.getElementById('sort-filter').value = 'desc';
+        applyFilters();
+    }
+
+    function displayOpportunities(opportunities) {
+        const signalsContainer = document.getElementById('betting-signals');
+        signalsContainer.innerHTML = ''; 
+
+        // Count data types
+        let betfairCount = 0, placeholderCount = 0;
+        
+        opportunities.forEach((data, idx) => {
+            const dataType = data.age === 'betfair-api' ? '🟢 BETFAIR API' : '🔵 PLACEHOLDER';
+            if (data.age === 'betfair-api') betfairCount++;
+            else placeholderCount++;
+            
+            console.log(`  Rendering [${idx+1}] ${dataType} | ${data.event1} | League: ${data.league1} | Profit: ${data.profit}% | Bookmakers: ${data.bookmaker1}${data.bookmaker2 ? ', '+data.bookmaker2 : ''}${data.bookmaker3 ? ', '+data.bookmaker3 : ''}`);
+            
+            const html = createOpportunityHtml(data);
+            signalsContainer.insertAdjacentHTML('beforeend', html);
+        });
+        
+        console.log(`%c[DISPLAY SUMMARY] Rendered ${opportunities.length} cards: ${betfairCount}x 🟢 BETFAIR API + ${placeholderCount}x 🔵 PLACEHOLDER`,
+            'color: #00cc00; font-weight: bold; font-size: 11px;');
+    }
+
+function createOpportunityHtml(data) {
+    const timeSource = data.time1 || '';
+    const dateParts = timeSource ? timeSource.split(' ') : ['', ''];
+    const timeDisplay = dateParts[1] || dateParts[0] || '00:00';
+
+    // Captura as odds
+    const o1 = data.odds1 ? parseFloat(data.odds1).toFixed(2) : '';
+    const o2 = data.odds2 ? parseFloat(data.odds2).toFixed(2) : '';
+    const o3 = data.odds3 ? parseFloat(data.odds3).toFixed(2) : '';
+
+    function safeText(value) {
+        return value ? String(value).replace(/"/g, '&quot;') : '';
+    }
+
+    // Monta as linhas de odds (exatamente como antes)
+    let oddsRows = '';
+    for (let i = 1; i <= 3; i++) {
+        if (data[`bookmaker${i}`] && data[`odds${i}`]) {
+            const oddVal = parseFloat(data[`odds${i}`]).toFixed(2);
+            const bkm = data[`bookmaker${i}`];
+            const mkt = data[`market${i}`] || 'Match';
+            const link = data[`event_link${i}`] || '#';
+
+            oddsRows += `
+                <div class="compact-odd-row">
+                    <span class="bkm-name">${bkm}</span>
+                    <span class="mkt-name">${mkt}</span>
+                    <a href="${link}" target="_blank" class="sb-odd-link">${oddVal}</a>
+                </div>`;
+        }
+    }
+
+    return `
+        <li class="sb-list-row sb-grid-layout">
+            <!-- COLUNA 1: LUCRO -->
+            <div class="sb-col-profit">
+                <div class="profit-badge">${parseFloat(data.profit).toFixed(2)}%</div>
+                <div class="sport-label">${data.sport1}</div>
+            </div>
+            
+            <!-- COLUNA 2: EVENTO -->
+            <div class="sb-col-event-info">
+                <div class="event-time-row">
+                    <i class="far fa-clock"></i> ${timeDisplay}
+                </div>
+                <a href="${data.event_link1 || '#'}" target="_blank" class="event-title-link">
+                   ${data.event1}
+                </a>
+                <div class="event-league">${data.league1}</div>
+            </div>
+
+            <!-- COLUNA 3: BOTÃO FANTASMA (ABRE CALCULADORA) -->
+            <div class="sb-col-action">
+                <button class="btn-ghost-calc calc-trigger" 
+                   data-odd1="${o1}" data-odd2="${o2}" data-odd3="${o3}" 
+                   data-evento="${safeText(data.event1)}" data-mercado="${safeText(data.market1)}">
+                   <i class="fas fa-calculator"></i>
+                </button>
+            </div>
+
+            <!-- COLUNA 4: ODDS -->
+            <div class="sb-col-odds-stack">
+                ${oddsRows}
+            </div>
+        </li>
+    `;
+}
+
+// Escuta cliques globais para abrir o modal
+document.addEventListener('click', function(e) {
+    const trigger = e.target.closest('.calc-trigger');
+    if (trigger) {
+        e.preventDefault();
+        const params = {
+            evento: trigger.getAttribute('data-evento'),
+            mercado: trigger.getAttribute('data-mercado'),
+            odd1: trigger.getAttribute('data-odd1'),
+            odd2: trigger.getAttribute('data-odd2'),
+            odd3: trigger.getAttribute('data-odd3')
+        };
+        // Chama a função que está no componente do modal
+        if (typeof abrirCalculadoraModal === 'function') {
+            abrirCalculadoraModal(params);
+        }
+    }
+});
+
+    async function loadFilterOptions() {
+        try {
+            const response = await fetch('/api/filters');
+            const filterOptions = await response.json();
+            
+            const bookmakerEl = document.getElementById('bookmaker-filter');
+            const sportEl = document.getElementById('sport-filter');
+
+            const bookmakerOptions = filterOptions.bookmakers.map(b => ({ value: b, label: b }));
+            const sportOptions = filterOptions.sports.map(s => ({ value: s, label: s }));
+
+            console.log(`%c[FILTER OPTIONS] Loading: ${bookmakerOptions.length} bookmakers | ${sportOptions.length} sports | Profit range: ${filterOptions.min_profit || 0}% - ${filterOptions.max_profit || 100}%`,
+                'color: #ff9900; font-weight: bold; font-size: 11px;');
+            console.log(`%c  📊 Bookmakers: ${bookmakerOptions.map(b => b.label).join(', ')}`,
+                'color: #ff9900; font-size: 10px;');
+            console.log(`%c  ⚽ Sports: ${sportOptions.map(s => s.label).join(', ')}`,
+                'color: #ff9900; font-size: 10px;');
+
+            const choicesConfig = {
+                removeItemButton: true,
+                searchEnabled: true,
+                placeholder: true,
+                placeholderValue: 'Selecione...',
+                noChoicesText: 'Sem opções',
+                itemSelectText: '',
+                shouldSort: false,
+                closeDropdownOnSelect: false, 
+            };
+
+            bookmakerChoices = new Choices(bookmakerEl, { ...choicesConfig, choices: bookmakerOptions });
+            sportChoices = new Choices(sportEl, { ...choicesConfig, choices: sportOptions });
+
+            fetchOpportunities(1, false);
+        } catch(e) { console.error(e); }
+    }
+
+    window.addEventListener('scroll', () => {
+        if (lastPage || isLoading) return;
+        const scrollY = window.scrollY || window.pageYOffset;
+        if ((window.innerHeight + scrollY) >= document.body.offsetHeight - 500) {
+            fetchOpportunities(currentPage + 1, true);
+        }
+    });
+
+    document.getElementById('apply-filters').addEventListener('click', applyFilters);
+    document.getElementById('clear-filters').addEventListener('click', clearFilters);
+
+    // Evento de Clique do Modal
+// Evento unificado de clique
+    document.addEventListener('click', function(e) {
+        
+        // Helper para extrair dados do elemento clicado
+        const getData = (el) => ({
+            odd1: el.getAttribute('data-odd1'),
+            odd2: el.getAttribute('data-odd2'),
+            odd3: el.getAttribute('data-odd3'),
+            evento: el.getAttribute('data-evento'),
+            mercado: el.getAttribute('data-mercado')
+        });
+
+        // CASO 1: Clicou no botão da Odd ou Nome do Evento (Abre calculadora apenas)
+        const triggerBtn = e.target.closest('.calc-trigger');
+        if (triggerBtn) {
+            e.preventDefault(); // Impede comportamento padrão
+            if (typeof abrirCalculadoraModal === 'function') {
+                abrirCalculadoraModal(getData(triggerBtn));
+            }
+            return;
+        }
+
+        // CASO 2: Clicou no Link da Casa de Apostas (Abre site E calculadora)
+        const linkBtn = e.target.closest('.calc-link-opener');
+        if (linkBtn) {
+            // NÃO usamos e.preventDefault() aqui, para o link abrir a nova aba
+            if (typeof abrirCalculadoraModal === 'function') {
+                abrirCalculadoraModal(getData(linkBtn));
+            }
+        }
+    });
+</script>
+{% endblock javascripts %}

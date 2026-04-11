@@ -1,0 +1,95 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Perfil {% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+<style>
+.profile-img {
+    border-radius: 50%;
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    margin-bottom: 15px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
+<div class="content">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="title">Editar Perfil</h5>
+                </div>
+
+                <div class="card-body">
+                    {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                    <div class="alert alert-info">
+                        {{ messages[0] }}
+                    </div>
+                    {% endif %}
+                    {% endwith %}
+                    <form id="form-user" method="post" action="{{ url_for('authentication.update_profile') }}">
+                        <div class="row">
+                            <div class="col-md-12 pr-md-1">
+                                <div class="form-group">
+                                    <label>Usuário</label>
+                                    <input type="text" name="username" class="form-control text-info" placeholder="Digite seu nome" value="{{ current_user.username }}" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Senha Atual</label>
+                                    <input type="password" class="form-control" placeholder="Digite sua senha atual" name="currentPassword">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 pr-md-1">
+                                <div class="form-group">
+                                    <label>Nova Senha</label>
+                                    <input type="password" class="form-control" placeholder="Digite a nova senha" name="newPassword">
+                                </div>
+                            </div>
+                            <div class="col-md-6 pl-md-1">
+                                <div class="form-group">
+                                    <label>Confirmar Nova Senha</label>
+                                    <input type="password" class="form-control" placeholder="Confirme a nova senha" name="confirmNewPassword">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-fill btn-primary">Salvar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script>
+    document.getElementById('form-user').onsubmit = function(event) {
+        var newPassword = document.getElementsByName('newPassword')[0].value;
+        var confirmNewPassword = document.getElementsByName('confirmNewPassword')[0].value;
+
+        if (newPassword !== confirmNewPassword) {
+            swal("Erro!", 'As novas senhas não coincidem.', "error");
+            event.preventDefault();
+        }
+    }
+</script>
+{% endblock javascripts %}

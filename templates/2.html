@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <link rel="icon" type="image/png" href="https://pt.surebet.com/assets/base/favicon-32x32-8a168896d5224d5e71a06a284228a2dce97d3611e7d6405f04ee9696d34fa69d.png">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        .sport-icon {
+            font-size: 1.5rem;
+            display: inline-block;
+            line-height: 1;
+        }
+    </style>
+</head>
+<body>
+    <h1>Calculadora de Surebets</h1>
+    
+    <label>Número de resultados da aposta segura:</label>
+    <select id="numResultados">
+        <option value="2">2</option>
+        <option value="3">3</option>
+    </select>
+    
+    <label>Tipo de aposta segura (fórmula):</label>
+    <select id="tipoAposta">
+        <option value="1-2">1 - 2</option>
+        <option value="1-X-2">1 - X - 2</option>
+    </select>
+
+    <table>
+        <tr>
+            <th>Chance</th>
+            <th>Odd</th>
+            <th>Aposta</th>
+            <th>Moeda</th>
+            <th>D</th>
+            <th>C</th>
+            <th>Lucro</th>
+        </tr>
+        <tr>
+            <td>+ 1</td>
+            <td><input type="number" class="odds" step="0.01" value="2.00"></td>
+            <td><input type="number" class="aposta" step="0.01" value="40"></td>
+            <td>
+                <select>
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                </select>
+            </td>
+            <td><input type="checkbox" checked></td>
+            <td><input type="radio" name="c"></td>
+            <td class="lucro">0.00</td>
+        </tr>
+        <tr>
+            <td>+ 2</td>
+            <td><input type="number" class="odds" step="0.01" value="3.00"></td>
+            <td><input type="number" class="aposta" step="0.01" value="50"></td>
+            <td>
+                <select>
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                </select>
+            </td>
+            <td><input type="checkbox" checked></td>
+            <td><input type="radio" name="c"></td>
+            <td class="lucro">0.00</td>
+        </tr>
+    </table>
+    
+    <label>Aposta total:</label>
+    <input type="number" id="stake" step="0.01" value="100">
+    
+    <button onclick="calcularSurebet()">Calcular</button>
+    <div id="result"></div>
+
+    <div class="filtros">
+        <label for="filtro-casa">Casa de Apostas:</label>
+        <input type="text" id="filtro-casa" placeholder="Ex: Bet365">
+
+        <label for="filtro-esporte">Esporte:</label>
+        <input type="text" id="filtro-esporte" placeholder="Ex: Futebol">
+
+        <button id="btn-filtrar">Filtrar</button>
+    </div>
+
+    <div id="apostas-container">
+        {% macro sport_icon(sport) %}
+            {% set name = sport|default('')|lower() %}
+            {% if 'futebol' in name or 'football' in name %}⚽
+            {% elif 'tênis' in name or 'tenis' in name %}🎾
+            {% elif 'basquete' in name or 'basketball' in name %}🏀
+            {% elif 'cavalo' in name or 'horse racing' in name %}🏇
+            {% elif 'rugby' in name %}🏉
+            {% elif 'beisebol' in name or 'baseball' in name %}⚾
+            {% elif 'volei' in name or 'volleyball' in name %}🏐
+            {% elif 'hockey' in name or 'hóquei' in name %}🏒
+            {% elif 'cricket' in name %}🏏
+            {% elif 'formula' in name or 'f1' in name %}🏎️
+            {% elif 'motogp' in name or 'moto' in name %}🏍️
+            {% else %}🏅
+            {% endif %}
+        {% endmacro %}
+
+        {% for aposta in apostas %}
+            <div class="card" data-casa="{{ aposta.casa }}" data-esporte="{{ aposta.esporte }}">
+                <h2>{{ aposta.evento }}</h2>
+                <p><strong>🏠 Casa:</strong> {{ aposta.casa }}</p>
+                <p><strong>⏳ Tempo:</strong> {{ aposta.tempo }}</p>
+                <p><span class="sport-icon" role="img" aria-label="{{ aposta.esporte }}" title="{{ aposta.esporte }}">{{ sport_icon(aposta.esporte) }}</span></p>
+                <p><strong>🎯 Mercado:</strong> {{ aposta.mercado }}</p>
+                <p><strong>💰 Lucro:</strong> {{ aposta.lucro }}</p>
+                <p><strong>📈 Chance:</strong> {{ aposta.chance }}</p>
+                <p><strong>📢 Sinal:</strong> <span class="sinal">{{ aposta.sinal }}</span></p>
+                <a href="{{ aposta.link }}" target="_blank" class="btn-link">🔗 Apostar na {{ aposta.casa }}</a>
+            </div>
+        {% endfor %}
+    </div>
+
+    <script>
+        function calcularSurebet() {
+            let oddsInputs = document.querySelectorAll('.odds');
+            let stakeTotal = parseFloat(document.getElementById('stake').value) || 100;
+            let odds = [];
+            let stakes = [];
+            
+            oddsInputs.forEach(input => {
+                let odd = parseFloat(input.value);
+                if (!isNaN(odd) && odd > 1) {
+                    odds.push(odd);
+                }
+            });
+
+            if (odds.length < 2) {
+                document.getElementById("result").innerHTML = `<p>Insira pelo menos duas odds válidas.</p>`;
+                return;
+            }
+
+            let total = odds.reduce((acc, odd) => acc + (1 / odd), 0);
+            if (total >= 1) {
+                document.getElementById("result").innerHTML = `<p>Não há Surebet disponível.</p>`;
+                return;
+            }
+
+            odds.forEach(odd => {
+                stakes.push((stakeTotal / odd) / total);
+            });
+            
+            let profit = stakeTotal * (1 - total);
+            document.getElementById("result").innerHTML = `
+                <p>Surebet encontrada!</p>
+                ${stakes.map((stake, index) => `<p>Aposta ${index + 1}: ${stake.toFixed(2)}</p>`).join('')}
+                <p>Lucro: ${profit.toFixed(2)}</p>
+            `;
+        }
+
+        document.getElementById("btn-filtrar").addEventListener("click", function() {
+            let filtroCasa = document.getElementById("filtro-casa").value.toLowerCase();
+            let filtroEsporte = document.getElementById("filtro-esporte").value.toLowerCase();
+            let apostas = document.querySelectorAll("#apostas-container .card");
+
+            apostas.forEach(aposta => {
+                let casa = aposta.getAttribute("data-casa").toLowerCase();
+                let esporte = aposta.getAttribute("data-esporte").toLowerCase();
+                aposta.style.display = (casa.includes(filtroCasa) && esporte.includes(filtroEsporte)) ? "block" : "none";
+            });
+        });
+    </script>
+</body>
+</html>

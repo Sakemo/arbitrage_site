@@ -1,0 +1,248 @@
+<!-- CALCULADORA MODAL PREMIUM -->
+<div class="custom-modal" id="calc-modal" style="display:none;">
+    <div class="custom-modal-content">
+        
+        <!-- Header Limpo -->
+        <div class="modal-header-custom">
+            <h5 class="m-0 font-weight-bold" style="color: var(--sb-accent); font-size: 0.9rem;">
+                <i class="fas fa-calculator mr-2"></i> CALCULADORA DE ARBITRAGEM
+            </h5>
+            <span class="custom-modal-close" onclick="fecharModal()">&times;</span>
+        </div>
+
+        <div class="calc-body">
+            
+            <!-- Info do Evento com melhor contraste -->
+            <div class="calc-info-box mb-3">
+                <div class="info-row border-bottom">
+                    <span class="label">EVENTO</span>
+                    <strong id="calc-evento" title="">--</strong>
+                </div>
+                <div class="info-row">
+                    <span class="label">MERCADO</span>
+                    <span id="calc-mercado" class="val-accent">--</span>
+                </div>
+            </div>
+
+            <form id="surebet-form" onsubmit="event.preventDefault(); calcularSurebet();">
+                
+                <!-- Grid de Odds -->
+                <div class="odds-grid mb-3">
+                    <div class="input-container">
+                        <label>Odd 1</label>
+                        <input type="number" id="odd1" step="0.01" class="form-control calc-input" required placeholder="0.00">
+                    </div>
+                    <div class="input-container">
+                        <label>Odd 2</label>
+                        <input type="number" id="odd2" step="0.01" class="form-control calc-input" required placeholder="0.00">
+                    </div>
+                    <div class="input-container">
+                        <label>Odd 3 (Op)</label>
+                        <input type="number" id="odd3" step="0.01" class="form-control calc-input" placeholder="-">
+                    </div>
+                </div>
+
+                <!-- Investimento -->
+                <div class="form-group mb-4">
+                    <label class="label-group">INVESTIMENTO TOTAL</label>
+                    <div class="input-group-custom">
+                        <span class="currency-prefix">R$</span>
+                        <input type="number" id="stake" step="0.01" class="form-control calc-input-stake" required value="100.00">
+                    </div>
+                </div>
+
+                <button type="button" onclick="calcularSurebet()" class="btn-calc-action">
+                    CALCULAR RETORNOS
+                </button>
+            </form>
+
+            <!-- Container de Resultados -->
+            <div id="resultado-container" class="mt-3" style="display:none;">
+                <div id="resultado" class="res-box"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --sb-accent: #00FF43;
+        --sb-card: #2F3237;
+        --sb-input: #1B1F24;
+        --sb-border: rgba(255,255,255,0.08);
+        --sb-text-muted: #9BA3AF;
+    }
+
+    .custom-modal {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(4px);
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .custom-modal-content {
+        background: var(--sb-card);
+        width: 100%;
+        max-width: 400px;
+        border-radius: 4px;
+        border: 1px solid rgba(0, 255, 67, 0.15);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        overflow: hidden;
+    }
+
+    .modal-header-custom {
+        padding: 15px 20px;
+        border-bottom: 1px solid var(--sb-border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .custom-modal-close {
+        color: var(--sb-text-muted);
+        cursor: pointer;
+        font-size: 1.2rem;
+    }
+    .custom-modal-close:hover { color: #fff; }
+
+    .calc-body { padding: 20px; }
+
+    /* Box de Informação do Jogo */
+    .calc-info-box {
+        background: rgba(0,0,0,0.2);
+        border: 1px solid var(--sb-border);
+        border-radius: 4px;
+    }
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px;
+        font-size: 0.8rem;
+    }
+    .info-row .label { color: var(--sb-text-muted); font-weight: bold; }
+    .info-row strong { color: #fff; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .val-accent { color: var(--sb-accent); font-weight: bold; }
+
+    /* Grid de Inputs */
+    .odds-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 10px;
+    }
+    .input-container label {
+        display: block;
+        font-size: 0.65rem;
+        color: var(--sb-text-muted);
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+
+    /* Estilo dos Inputs */
+    .calc-input, .calc-input-stake {
+        background: var(--sb-input) !important;
+        border: 1px solid var(--sb-border) !important;
+        color: #fff !important;
+        border-radius: 4px !important;
+        padding: 8px !important;
+        font-weight: bold;
+        text-align: center;
+    }
+    .calc-input:focus { border-color: var(--sb-accent) !important; outline: none; }
+
+    /* Input de Stake Customizado */
+    .label-group { font-size: 0.7rem; color: var(--sb-text-muted); font-weight: bold; margin-bottom: 8px; display: block; }
+    .input-group-custom {
+        display: flex;
+        align-items: center;
+        background: var(--sb-input);
+        border: 1px solid var(--sb-border);
+        border-radius: 4px;
+    }
+    .currency-prefix { padding: 0 12px; color: var(--sb-text-muted); font-weight: bold; border-right: 1px solid var(--sb-border); }
+    .calc-input-stake { border: none !important; flex: 1; text-align: left; padding-left: 15px !important; }
+
+    /* Botão de Ação */
+    .btn-calc-action {
+        width: 100%;
+        background: var(--sb-accent);
+        color: #000;
+        border: none;
+        padding: 12px;
+        border-radius: 4px;
+        font-weight: 800;
+        font-size: 0.85rem;
+        letter-spacing: 1px;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    .btn-calc-action:hover { background: #66ff7a; }
+
+    /* Resultado */
+    .res-box {
+        padding: 15px;
+        border-radius: 4px;
+        font-size: 0.85rem;
+    }
+    .res-success { background: rgba(0, 255, 67, 0.1); border: 1px solid rgba(0, 255, 67, 0.2); color: #fff; }
+    .res-danger { background: rgba(255, 67, 67, 0.1); border: 1px solid rgba(255, 67, 67, 0.2); color: #ffbaba; }
+    
+    .res-line { display: flex; justify-content: space-between; margin-bottom: 5px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 3px; }
+</style>
+
+<script>
+    function fecharModal() {
+        document.getElementById('calc-modal').style.display = 'none';
+    }
+
+    function abrirCalculadoraModal({evento, mercado, odd1, odd2, odd3}) {
+        const modal = document.getElementById('calc-modal');
+        modal.style.display = 'flex';
+        
+        document.getElementById('calc-evento').textContent = evento || 'Evento';
+        document.getElementById('calc-evento').title = evento || ''; 
+        document.getElementById('calc-mercado').textContent = mercado || 'Match';
+        
+        document.getElementById('odd1').value = odd1 || '';
+        document.getElementById('odd2').value = odd2 || '';
+        document.getElementById('odd3').value = odd3 || '';
+        
+        document.getElementById('resultado-container').style.display = 'none';
+    }
+
+    function calcularSurebet() {
+        let o1 = parseFloat(document.getElementById("odd1").value);
+        let o2 = parseFloat(document.getElementById("odd2").value);
+        let o3 = parseFloat(document.getElementById("odd3").value) || 0;
+        let stake = parseFloat(document.getElementById("stake").value);
+        
+        const resContainer = document.getElementById('resultado-container');
+        const resDiv = document.getElementById('resultado');
+        resContainer.style.display = 'block';
+
+        if (o1 > 1 && o2 > 1 && stake > 0) {
+            let inv = (1/o1) + (1/o2) + (o3 > 1 ? (1/o3) : 0);
+            
+            if (inv < 1) {
+                let s1 = (stake * (1/o1)) / inv;
+                let s2 = (stake * (1/o2)) / inv;
+                let s3 = o3 > 1 ? (stake * (1/o3)) / inv : 0;
+                let profit = stake * (1 - inv) / inv;
+
+                resDiv.className = 'res-box res-success';
+                resDiv.innerHTML = `
+                    <div style="text-align:center; color:var(--sb-accent); margin-bottom:10px;"><strong>LUCRO: R$ ${profit.toFixed(2)} (${((1/inv-1)*100).toFixed(2)}%)</strong></div>
+                    <div class="res-line"><span>Aposta 1:</span> <strong>R$ ${s1.toFixed(2)}</strong></div>
+                    <div class="res-line"><span>Aposta 2:</span> <strong>R$ ${s2.toFixed(2)}</strong></div>
+                    ${o3 > 1 ? `<div class="res-line"><span>Aposta 3:</span> <strong>R$ ${s3.toFixed(2)}</strong></div>` : ''}
+                `;
+            } else {
+                resDiv.className = 'res-box res-danger';
+                resDiv.innerHTML = `<div style="text-align:center;"><strong>Sem Lucro Garantido</strong><br><small>As odds não permitem arbitragem.</small></div>`;
+            }
+        }
+    }
+</script>

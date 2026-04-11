@@ -1,0 +1,15 @@
+[credentials]
+email = "williamoliveira02@outlook.com"
+
+
+[exchange]
+buy_exchanges = "Binance, Okx, Chiliz, Mercado Bitcoin, Ripio, Kucoin, Coinbase, Foxbit"
+sell_exchanges = "Okx, Binance, Chiliz, Mercado Bitcoin, Ripio, Kucoin, Coinbase, Foxbit"
+
+[finance]
+dollar_value = "5.16"
+automatic_dollar_value = true
+
+[flask]
+secret_key = "5f2c4f92d4a2e1b8b97f9f5d6e1d8e1f7c9e1f3a7e9b8c3e2d1f5e9f7a1b4c3d"
+database_uri = "sqlite:///database.db" 

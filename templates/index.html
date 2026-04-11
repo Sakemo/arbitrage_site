@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="https://pt.surebet.com/assets/base/favicon-32x32.png">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="surebet-table">
+        <h1>🎲🎲🎲🎲🎲🎲🎲🎲🎲 Surebets 🎲🎲🎲🎲🎲🎲🎲🎲🎲🎲</h1>
+        
+        <div class="filtros">
+            <label for="filtros">Casa de Apostas:</label>
+            <input type="text" id="filtro-casa" placeholder="Ex: Bet365">
+
+            <label for="filtro-esporte">Esporte:</label>
+            <input type="text" id="filtro-esporte" placeholder="Ex: Futebol">
+
+            <button id="btn-filtrar">Filtrar</button>
+        </div>
+
+        <table class="surebet-table">
+            <thead>
+                <tr>
+                    <th>💰 Lucro</th>
+                    <th>🏠 Casa de Apostas</th>
+                    <th>📅 Evento</th>
+                    <th>🎯 Mercado</th>
+                    <th>📈 Chance</th>
+                    <th>🧮 Calcular</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for aposta in apostas %}
+                <tr class="aposta" data-casa="{{ aposta.casa }}" data-esporte="{{ aposta.esporte }}">
+                    <td>{{ aposta.lucro }}</td>
+                    <td>{{ aposta.casa }}</td>
+                    <td>{{ aposta.evento }}<br><small>{{ aposta.tempo }}</small></td>
+                    <td>{{ aposta.mercado }}</td>
+                    <td><a href="{{ aposta.link }}" target="_blank" class="odds-link">{{ aposta.chance }}</a></td>
+                    <td>
+                        <button class="btn-calculadora" onclick="abrirCalculadora('{{ aposta.evento }}', '{{ aposta.mercado }}', '{{ aposta.chance }}')">Calcular</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function abrirCalculadora(evento, mercado, chance) {
+            let urlCalculadora = `/calculadora?surebet=true&evento=${encodeURIComponent(evento)}&mercado=${encodeURIComponent(mercado)}&chance=${encodeURIComponent(chance)}`;
+            window.open(urlCalculadora, '_blank');
+        }
+
+        document.getElementById("btn-filtrar").addEventListener("click", function () {
+            let filtroCasa = document.getElementById("filtro-casa").value.toLowerCase();
+            let filtroEsporte = document.getElementById("filtro-esporte").value.toLowerCase();
+
+            document.querySelectorAll(".aposta").forEach(aposta => {
+                let casa = aposta.getAttribute("data-casa").toLowerCase();
+                let esporte = aposta.getAttribute("data-esporte").toLowerCase();
+
+                if ((filtroCasa && !casa.includes(filtroCasa)) || (filtroEsporte && !esporte.includes(filtroEsporte))) {
+                    aposta.style.display = "none";
+                } else {
+                    aposta.style.display = "table-row";
+                }
+            });
+        });
+    </script>
+</body>
+</html>

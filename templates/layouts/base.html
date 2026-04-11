@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="icon" type="image/png" href="/static/assets/img/logo.png">
+
+    <title>
+    </title>
+
+    <link href="https://fonts.googleapis.com/css?family=Poppins:200,300,400,600,700,800" rel="stylesheet" />
+    <link href="https://use.fontawesome.com/releases/v5.0.6/css/all.css" rel="stylesheet">
+    
+    <link href="/static/assets/css/nucleo-icons.css" rel="stylesheet" />
+    <link href="/static/assets/css/black-dashboard.css?v=1.1.1" rel="stylesheet" />
+
+<style>
+    :root {
+        --sb-card: #2F3237;
+        --sb-accent: #00FF43;
+        --sb-text: #E0E0E0;
+        --sb-muted: #9BA3AF;
+        --sb-border: rgba(255,255,255,0.05);
+    }
+
+    /* Container Principal */
+    .betting-signals {
+        padding: 10px;
+    }
+
+    .sb-list-row {
+        display: flex;
+        align-items: center;
+        background: var(--sb-card);
+        margin-bottom: 6px;
+        padding: 8px 15px;
+        border-radius: 4px;
+        border: 1px solid var(--sb-border);
+        transition: transform 0.1s;
+    }
+
+    .sb-list-row:hover {
+        border-color: rgba(0,255,67,0.3);
+    }
+
+    /* Coluna de Lucro */
+    .sb-col-profit {
+        flex: 0 0 80px;
+        text-align: center;
+        border-right: 1px solid var(--sb-border);
+        margin-right: 15px;
+    }
+
+    .profit-badge {
+        color: var(--sb-accent);
+        font-weight: 800;
+        font-size: 1.1rem;
+    }
+
+    .sport-label {
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        color: var(--sb-muted);
+        letter-spacing: 1px;
+    }
+
+    /* Coluna do Evento */
+    .sb-col-event-info {
+        flex: 1;
+        min-width: 0; /* Evita que o texto quebre o layout */
+    }
+
+    .event-main-line {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .event-time {
+        font-size: 0.75rem;
+        color: var(--sb-muted);
+        font-family: monospace;
+    }
+
+    .event-title-link {
+        font-weight: 600;
+        color: #FFFFFF !important;
+        text-decoration: none;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .event-league {
+        font-size: 0.75rem;
+        color: var(--sb-muted);
+    }
+
+    /* Coluna das Odds (Onde fica compacto) */
+    .sb-col-odds-stack {
+        flex: 0 0 280px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .compact-odd-row {
+        display: flex;
+        text-align: left;
+        justify-content: space-between;
+        background: rgba(0,0,0,0.2);
+        padding: 2px 8px;
+        border-radius: 2px;
+    }
+
+    .bkm-name {
+        font-size: 0.7rem;
+        font-weight: bold;
+        color: var(--sb-muted);
+        width: 70px;
+    }
+
+    .mkt-name {
+        font-size: 0.7rem;
+        color: #777;
+        flex: 1;
+        text-align: left;
+        margin-left: 5px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .sb-odd-link {
+        background: rgba(0,255,67,0.1);
+        color: var(--sb-accent) !important;
+        padding: 2px 8px;
+        border-radius: 2px;
+        font-weight: bold;
+        font-size: 0.85rem;
+        text-decoration: none;
+        min-width: 45px;
+        text-align: center;
+        border: 1px solid rgba(0,255,67,0.2);
+    }
+
+    .sb-odd-link:hover {
+        background: var(--sb-accent);
+        color: #000 !important;
+    }
+
+   .sb-col-event-info {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center; /* Centraliza horizontalmente */
+        justify-content: center; /* Centraliza verticalmente */
+        text-align: center;
+    }
+
+    .event-main-line {
+        display: flex;
+        align-items: center;
+        justify-content: center; /* Centraliza o Tempo e o Título */
+        gap: 10px;
+        width: 100%;
+    }
+
+    /* Centraliza os itens dentro das linhas de odds */
+    .compact-odd-row {
+        display: flex;
+        background: rgba(0,0,0,0.2);
+        padding: 4px 6px;
+        border-radius: 2px;
+        gap: 12px; /* Espaçamento entre Casa, Mercado e Botão */
+    }
+
+    .mkt-name {
+        font-size: 0.7rem;
+        color: #777;
+        /* Removido o flex: 1 para não empurrar os itens para os lados */
+        text-align: left; 
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100px;
+    }
+
+    /* Garante que o cabeçalho também pareça alinhado */
+    .sb-list-header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(0,255,67,0.08) !important;
+        border-bottom: 1px solid rgba(0,255,67,0.2) !important;
+        color: var(--sb-text) !important;
+        font-weight: 700;
+        padding: 4px 7px;
+        text-align: center;
+    }
+
+    .sb-list-header div {
+        flex: 1;
+        text-align: center;
+    }
+
+
+    /* Responsivo Mobile */
+    @media (max-width: 768px) {
+        .sb-list-row {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        .sb-col-profit {
+            border-right: none;
+            border-bottom: 1px solid var(--sb-border);
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 5px;
+        }
+        .sb-col-odds-stack {
+            flex: 1;
+            margin-top: 10px;
+        }
+    }
+</style>
+
+    {% block stylesheets %}{% endblock stylesheets %}
+        
+</head>
+<body class="">
+
+    <div class="wrapper">
+
+        {% include 'includes/sidebar.html' %}
+
+        <div class="main-panel">
+
+            {% include 'includes/navigation.html' %}
+
+            {% block content %}{% endblock content %}
+
+            {% include 'includes/footer.html' %}
+
+        </div>
+    </div>
+
+    {% include 'includes/fixed-plugin.html' %}
+
+    {% include 'includes/scripts.html' %}
+
+    {% block javascripts %}{% endblock javascripts %}
+
+</body>
+</html>

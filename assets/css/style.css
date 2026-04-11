@@ -1,0 +1,85 @@
+/* Estilos gerais */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #0d0d0d;
+    color: #fff;
+    text-align: center;
+    margin: 0;
+    padding: 20px;
+}
+
+/* Estiliza o título principal */
+h1 {
+    color: #32cd32;
+    font-size: 28px;
+}
+
+/* Contêiner dos filtros */
+#filtros {
+    background-color: #111;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 2px;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+/* Labels dos filtros */
+label {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+/* Estilos dos selects */
+select {
+    background-color: #222;
+    color: #fff;
+    border: 1px solid #32cd32;
+    padding: 8px;
+    border-radius: 2px;
+}
+
+/* Contêiner dos resultados */
+#resultados {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+}
+
+/* Card das apostas */
+.card {
+    background-color: #111;
+    border: 2px solid #32cd32;
+    border-radius: 2px;
+    padding: 15px;
+    width: 280px;
+    text-align: left;
+    box-shadow: 0 0 10px rgba(50, 205, 50, 0.5);
+}
+
+/* Título do evento */
+.card h3 {
+    color: #32cd32;
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+/* Parágrafos do card */
+.card p {
+    font-size: 14px;
+    margin: 5px 0;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    #filtros {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    select {
+        width: 80%;
+    }
+}

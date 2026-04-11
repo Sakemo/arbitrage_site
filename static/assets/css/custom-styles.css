@@ -1,0 +1,322 @@
+/* =========================================
+   1. Variáveis de Cor (Tema Surebet Clean)
+   ========================================= */
+:root {
+    --sb-bg-body: #f5f7fa;       /* Fundo geral cinza muito claro */
+    --sb-bg-card: #ffffff;       /* Fundo dos cards/linhas */
+    --sb-border: #e0e0e0;        /* Bordas sutis */
+    --sb-text-main: #333333;     /* Texto principal */
+    --sb-text-muted: #777777;    /* Texto secundário */
+    --sb-header-bg: #f8f9fa;     /* Fundo de cabeçalhos de tabela */
+    --sb-blue-link: #3498db;     /* Azul padrão para links */
+    --sb-color-league: #27ae60;  /* Verde profissional para lucro */
+    --sb-hover: #f2f4f6;         /* Cor ao passar o mouse */
+}
+
+/* =========================================
+   2. Layout Principal e Container
+   ========================================= */
+.betting-signals-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Espaçamento menor para parecer uma lista contínua */
+    width: 100%;
+}
+
+.betting-signals {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+}
+
+/* Linha da Aposta (Card Horizontal) */
+.betting-signals > li {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    background: var(--sb-bg-card);
+    border: 1px solid var(--sb-border);
+    border-radius: 4px; /* Bordas menos arredondadas, mais sérias */
+    padding: 0;
+    margin-bottom: 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); /* Sombra muito suave */
+    overflow: hidden;
+    transition: background-color 0.2s ease;
+}
+
+.betting-signals > li:hover {
+    background-color: var(--sb-hover);
+    border-color: #ccc;
+}
+
+/* =========================================
+   3. Tabelas (Visualização Desktop)
+   ========================================= */
+.odds-table {
+    margin: 0;
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.odds-table th {
+    background: var(--sb-header-bg) !important;
+    color: var(--sb-text-muted) !important;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    padding: 10px 15px !important;
+    text-align: center;
+    border-bottom: 2px solid var(--sb-border);
+}
+
+.odds-table td {
+    padding: 10px 15px;
+    color: var(--sb-text-main);
+    border-bottom: 1px solid var(--sb-border);
+    text-align: center;
+    vertical-align: middle;
+}
+
+.odds-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* Links dentro da tabela (ex: Casas de aposta) */
+.odds-table a {
+    color: var(--sb-text-main);
+    text-decoration: none;
+    font-weight: 500;
+}
+.odds-table a:hover {
+    color: var(--sb-blue-link);
+    text-decoration: underline;
+}
+
+/* Destaque para a Odd */
+.odds-table td strong, .odd-value {
+    color: var(--sb-blue-link);
+    font-weight: 700;
+}
+
+.responsive-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+/* =========================================
+   4. Painel de Informações (Lateral)
+   ========================================= */
+.info-panel {
+    background: #fdfdfd;
+    border-left: 1px solid var(--sb-border);
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 200px;
+}
+
+.profit-value {
+    color: var(--sb-green-profit);
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+/* =========================================
+   5. Inputs & Filtros (Estilo Clean/White)
+   ========================================= */
+
+/* Reset total dos inputs para branco/cinza */
+.filter-input-green,
+select.filter-input-green,
+input.filter-input-green,
+input[type="date"].filter-input-green,
+input[type="number"].filter-input-green,
+.form-control {
+    background: #ffffff !important;
+    color: #333333 !important;
+    border: 1px solid #ced4da !important;
+    border-radius: 4px !important;
+    box-shadow: none !important;
+    font-weight: 400;
+    font-size: 0.95rem !important;
+    padding: 6px 12px !important;
+    min-height: 38px !important;
+    transition: border-color 0.15s ease-in-out;
+}
+
+/* Estado de foco (Azul padrão web, não verde neon) */
+.filter-input-green:focus, 
+.form-control:focus {
+    outline: none !important;
+    border-color: #80bdff !important;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25) !important;
+    background: #ffffff !important;
+}
+
+.filter-input-green::placeholder {
+    color: #6c757d;
+    opacity: 1;
+}
+
+/* Choices.js Clean Styling (Resetando o estilo da biblioteca) */
+.choices__inner {
+    background-color: #ffffff !important;
+    border: 1px solid #ced4da !important;
+    border-radius: 4px !important;
+    color: #333 !important;
+    font-weight: 400;
+    min-height: 38px;
+}
+
+.choices__list--dropdown {
+    background-color: #ffffff !important;
+    border: 1px solid #ced4da !important;
+    color: #333 !important;
+}
+
+.choices__item--choice.is-highlighted {
+    background-color: #f1f1f1 !important; /* Cinza claro ao passar o mouse */
+    color: #000 !important;
+}
+
+/* Labels */
+label {
+    font-weight: 600;
+    font-size: 0.85rem;
+    margin-bottom: 5px;
+    display: block;
+}
+
+/* Botões */
+.calc-btn, .calc-modal-btn {
+    background: var(--sb-green-profit) !important; /* Verde sólido profissional */
+    color: #ffffff !important;
+    font-weight: 600 !important;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 0;
+    width: 100%;
+    cursor: pointer;
+    transition: background 0.2s;
+    box-shadow: none !important;
+}
+
+.calc-btn:hover, .calc-modal-btn:hover {
+    background: rgb(227, 227, 227) !important; /* Verde um pouco mais escuro */
+    transform: none;
+}
+
+/* =========================================
+   6. Responsividade (Mobile)
+   ========================================= */
+
+.surebet-mobile-card {
+    display: none; /* Escondido no Desktop */
+}
+
+@media (max-width: 991.98px) {
+    /* Esconde elementos de tabela desktop */
+    .responsive-table-wrapper, 
+    .odds-table, 
+    .vertical-divider,
+    .info-panel { 
+        display: none !important; 
+    }
+
+    /* Mostra Card Mobile */
+    .surebet-mobile-card {
+        display: block !important;
+        width: 100%;
+    }
+
+    .betting-signals > li {
+        flex-direction: column !important;
+        background: #ffffff !important;
+        border: 1px solid #e0e0e0 !important;
+        border-radius: 8px !important;
+        padding: 15px !important;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05) !important;
+    }
+
+    /* Cabeçalho do Card Mobile */
+    .surebet-mobile-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 8px;
+    }
+
+    .surebet-mobile-header .profit {
+        background: rgba(39, 174, 96, 0.1); /* Fundo verde bem claro */
+        color: var(--sb-green-profit);
+        font-weight: 700;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 1rem;
+    }
+
+    .surebet-mobile-header .meta-info {
+        color: #999;
+        font-size: 0.8rem;
+    }
+
+    .surebet-mobile-event {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--sb-text-main);
+        margin-bottom: 12px;
+        text-align: center;
+    }
+
+    /* Lista de Odds Mobile */
+    .surebet-mobile-odds-list {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .surebet-mobile-odd {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #f8f9fa; /* Fundo cinza bem claro */
+        padding: 8px 12px;
+        border-radius: 4px;
+        border-left: 3px solid var(--sb-blue-link); /* Detalhe azul */
+    }
+
+    .surebet-mobile-odd .bookmaker {
+        color: var(--sb-text-main);
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .surebet-mobile-odd .odd-value a {
+        color: var(--sb-blue-link);
+        font-weight: 700;
+        font-size: 1rem;
+        text-decoration: none;
+    }
+
+    .surebet-mobile-odd .market {
+        color: #888;
+        font-size: 0.85rem;
+    }
+
+    /* Botão Mobile */
+    .surebet-mobile-footer {
+        margin-top: 12px;
+    }
+    
+    .surebet-mobile-footer .calc-btn {
+        padding: 10px 0;
+        font-size: 0.95rem;
+    }
+}

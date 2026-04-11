@@ -1,0 +1,18 @@
+# Iniciar todos os serviços
+sudo systemctl start bot_reacoes.service gunicorn_surebet.service 
+repasse_telegram.service run_scrap_on_vps.service
+
+# Parar todos os serviços
+sudo systemctl stop bot_reacoes.service gunicorn_surebet.service repasse_telegram.service run_scrap_on_vps.service
+
+# Habilitar todos para iniciar no boot
+sudo systemctl enable bot_reacoes.service gunicorn_surebet.service repasse_telegram.service run_scrap_on_vps.service
+
+# Checar status detalhado de todos
+sudo systemctl status bot_reacoes.service gunicorn_surebet.service repasse_telegram.service run_scrap_on_vps.service
+
+# Verificar se estão ativos
+sudo systemctl is-active bot_reacoes.service gunicorn_surebet.service repasse_telegram.service run_scrap_on_vps.service
+
+# Ver logs recentes de um serviço (troque NOME_DO_SERVICO pelo nome desejado)
+sudo journalctl -u NOME_DO_SERVICO -n 30 --no-pager

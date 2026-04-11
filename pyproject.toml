@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "scrap nextgain"
+version = "0.1.0"
+description = ""
+authors = ["Rubiali"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+toml = "^0.10.2"
+requests = "^2.31.0"
+sqlalchemy = "^2.0.30"
+flask = "^3.0.3"
+flask-sqlalchemy = "^3.1.1"
+colorama = "^0.4.6"
+flask-socketio = "^5.3.6"
+flask-wtf = "^1.2.1"
+wtforms = "^3.1.2"
+flask-session = "^0.8.0"
+flask-login = "^0.6.3"
+flask-limiter = "^3.6.0"
+eventlet = "^0.36.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

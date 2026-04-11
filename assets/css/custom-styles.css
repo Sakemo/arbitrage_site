@@ -1,0 +1,23 @@
+.betting-signals-container {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+
+.betting-signals-container .card {
+    width: 100%;
+    min-height: 50px;
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    border: 1px solid rgba(100,240,145,0.35);
+    background-color: #08140d;
+    color: #ecf9e9;
+    border-radius: 0.85rem;
+    box-shadow: 0 10px 24px rgba(0, 110, 45, 0.16);
+}
+
+.betting-signals-container .card i {
+    color: #64f091;
+}
+ 

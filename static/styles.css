@@ -1,0 +1,77 @@
+/* Estilização da tabela */
+.surebet-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 18px;
+    background: #07110a;
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 18px 50px rgba(0, 80, 30, 0.2);
+    border: 1px solid rgba(100,240,145,0.16);
+    font-size: 0.95rem;
+}
+
+.filtros {
+    background-color: #0f3d1c;
+    color: #edf9ea;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.surebet-table th, .surebet-table td {
+    padding: 12px 14px;
+    text-align: left;
+    border-bottom: 1px solid rgba(100,240,145,0.12);
+}
+
+.surebet-table th {
+    background-color: #0f3d1c;
+    color: #f6fbf4;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 0.86rem;
+}
+
+.surebet-table tr {
+    background-color: #08120c;
+    transition: background 0.15s ease;
+}
+
+.surebet-table tr:hover {
+    background-color: rgba(100,240,145,0.08);
+}
+
+.surebet-table td {
+    color: #d9edda;
+}
+
+.odds-link {
+    color: #8df7b4;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.odds-link:hover {
+    text-decoration: underline;
+    color: #b7ffda;
+}
+
+.surebet-table h1 {
+    color: #effdf4;
+    background-color: #0f3d1c;
+    text-align: center;
+    font-size: 1.3rem;
+    padding: 12px 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.sport-icon {
+    font-size: 1.5rem;
+    display: inline-block;
+    line-height: 1;
+}
+
+button, input, select, textarea {
+    font-size: 0.95rem;
+}

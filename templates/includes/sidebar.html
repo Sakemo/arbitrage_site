@@ -1,0 +1,224 @@
+<style>
+    /* =========================================
+       SIDEBAR & LAYOUT FIX (CORREÇÃO DE SOBREPOSIÇÃO)
+       ========================================= */
+    
+    /* 1. ESTILO DA SIDEBAR (Visual) */
+    .sidebar {
+        background: #3C4045 !important;
+        width: 250px;
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 1040;
+        box-shadow: 2px 0 28px rgba(0,0,0,0.45);
+        transition: all 0.3s cubic-bezier(0.685, 0.0473, 0.346, 1);
+    }
+
+    .sidebar-wrapper {
+        position: relative;
+        height: 100%;
+        overflow-y: auto;
+        overflow-x: hidden;
+        z-index: 4;
+    }
+
+    .simple-text {
+        color: #ffffff;
+        text-transform: uppercase;
+        font-weight: 700;
+        font-size: 1.1rem;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+
+    /* Links de Navegação */
+    .nav {
+        margin-top: 20px;
+        list-style: none;
+        padding: 0;
+    }
+
+    .nav li { width: 100%; }
+
+    .nav li > a {
+        display: flex;
+        align-items: center;
+        margin: 6px 14px;
+        padding: 11px 14px;
+        border-radius: 0.85rem;
+        color: rgba(255, 255, 255, 0.82) !important;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.22s ease;
+    }
+
+    .nav li > a i {
+        font-size: 1.15rem;
+        margin-right: 13px;
+        color: var(--sb-accent);
+    }
+
+    /* Hover e Ativo */
+    .nav li > a:hover, .nav li.active > a {
+        background-color: rgba(0,255,67,0.12);
+        color: #ffffff !important;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.22);
+    }
+    .nav li > a:hover i, .nav li.active > a i {
+        color: var(--sb-accent) !important;
+    }
+
+    /* Botão Fechar (Mobile) */
+    .close-sidebar-btn {
+        display: none;
+        background: transparent;
+        border: none;
+        color: #ffffff;
+        font-size: 1.5rem;
+        cursor: pointer;
+        padding: 0;
+    }
+
+    /* =========================================
+       2. REGRAS DE COMPORTAMENTO (RESPONSIVIDADE)
+       ========================================= */
+
+    /* DESKTOP (Telas maiores que 992px) */
+    @media (min-width: 992px) {
+        /* Garante que o conteúdo principal NÃO fique embaixo da sidebar */
+        .main-panel {
+            width: calc(100% - 250px) !important; /* Subtrai a largura da sidebar */
+            margin-left: 250px !important;        /* Empurra o conteúdo para a direita */
+            transition: all 0.3s cubic-bezier(0.685, 0.0473, 0.346, 1);
+        }
+        
+        .sidebar {
+            display: block !important;
+            transform: translate3d(0, 0, 0) !important;
+        }
+    }
+
+    /* MOBILE / TABLET (Telas menores que 991px) */
+    @media (max-width: 991.98px) {
+        
+        /* Conteúdo ocupa a tela toda */
+        .main-panel {
+            width: 100% !important;
+            margin-left: 0 !important;
+            transition: transform 0.3s cubic-bezier(0.685, 0.0473, 0.346, 1);
+        }
+
+        /* Sidebar começa escondida à esquerda */
+        .sidebar {
+            position: fixed !important;
+            display: block !important;
+            top: 0;
+            height: 100%;
+            width: 260px;
+            right: auto;
+            left: 0;
+            z-index: 1032;
+            transform: translate3d(-260px, 0, 0) !important; 
+            transition: all 0.33s cubic-bezier(0.685, 0.0473, 0.346, 1);
+        }
+
+        /* Quando aberto (classe no body) */
+        .nav-open .sidebar {
+            transform: translate3d(0, 0, 0) !important;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+        }
+        
+        /* Move o painel principal ligeiramente quando o menu abre (Opcional, estilo app nativo) */
+        .nav-open .main-panel {
+            transform: translate3d(260px, 0, 0);
+        }
+
+        .close-sidebar-btn {
+            display: block !important;
+        }
+
+        /* Overlay Escuro */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.5);
+            z-index: 1030;
+            display: none;
+            backdrop-filter: blur(2px);
+        }
+
+        .nav-open .sidebar-overlay {
+            display: block;
+        }
+    }
+</style>
+
+<div class="sidebar-overlay" onclick="toggleSidebarMobile()"></div>
+
+<div class="sidebar">
+    <div class="sidebar-wrapper">
+        <div class="logo">
+            <button class="close-sidebar-btn" onclick="toggleSidebarMobile()">
+                <i class="tim-icons icon-simple-remove"></i>
+            </button>
+        </div>
+
+        <ul class="nav">
+            <li class="{% if request.path == '/' %}active{% endif %}">
+                <a href="/">
+                    <i class="tim-icons icon-chart-pie-36"></i>
+                    <p style="color: white;"></p>
+                </a>
+            </li>
+            
+            {% if current_user.is_authenticated and current_user.is_admin %}
+            <li class="{% if request.path == '/users' %}active{% endif %}">
+                <a href="{{ url_for('views.admin_users') }}">
+                    <i class="tim-icons icon-single-02"></i>
+                    <p style="color: white;">Gerenciar Usuários</p>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </div>
+</div>
+
+<script>
+    function toggleSidebarMobile() {
+        var body = document.body;
+        if (body.classList.contains('nav-open')) {
+            body.classList.remove('nav-open');
+        } else {
+            body.classList.add('nav-open');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var navbarToggle = document.querySelector('.navbar-toggler');
+        
+        if (navbarToggle) {
+            var newToggle = navbarToggle.cloneNode(true);
+            navbarToggle.parentNode.replaceChild(newToggle, navbarToggle);
+            
+            newToggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                toggleSidebarMobile();
+            });
+        }
+
+        var links = document.querySelectorAll('.sidebar .nav li a');
+        links.forEach(function(link) {
+            link.addEventListener('click', function() {
+                if (window.innerWidth < 991) {
+                    document.body.classList.remove('nav-open');
+                }
+            });
+        });
+    });
+</script>
