@@ -5,6 +5,6 @@ requests==2.32.4
 asyncio
 toml
 setuptools
-eventlet==0.33.3
+eventlet==0.35.2
 gunicorn==21.2.0
 flask-login
