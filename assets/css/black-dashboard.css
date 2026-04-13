@@ -11332,7 +11332,7 @@ img {
 .form-group .input-group-append .input-group-text,
 .input-group .input-group-prepend .input-group-text,
 .input-group .input-group-append .input-group-text {
-  padding: 10px 0 10px 18px; }
+  padding: 10px; }
   .form-group .input-group-prepend .input-group-text + .form-control,
   .form-group .input-group-prepend .input-group-text ~ .form-control,
   .form-group .input-group-append .input-group-text + .form-control,
