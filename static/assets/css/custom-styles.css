@@ -172,9 +172,9 @@ input[type="number"].filter-input-green,
 }
 
 .choices__list--dropdown {
-    background-color: #ffffff !important;
+    background-color: #f7f7f7 !important;
     border: 1px solid #ced4da !important;
-    color: #333 !important;
+    color: #c7c7c7 !important;
 }
 
 .choices__item--choice.is-highlighted {
@@ -230,15 +230,13 @@ label {
 
     /* Mostra Card Mobile */
     .surebet-mobile-card {
-        display: block !important;
         width: 100%;
     }
 
     .betting-signals > li {
         flex-direction: column !important;
-        background: #ffffff !important;
-        border: 1px solid #e0e0e0 !important;
-        border-radius: 8px !important;
+        border: 1px solid #414141 !important;
+        border-radius: 2px !important;
         padding: 15px !important;
         box-shadow: 0 2px 5px rgba(0,0,0,0.05) !important;
     }

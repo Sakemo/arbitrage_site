@@ -60,11 +60,15 @@
         border: 1px solid var(--sb-border) !important;
     }
 
+    .choices__input {
+        padding: 4px;
+        border-radius: 2px !important;
+    }
+
     .choices__inner {
         background-color: var(--sb-input) !important;
         border: none !important;
         box-shadow: none !important;
-        border-radius: 0.75rem !important;
         min-height: 42px;
     }
     .choices__inner.is-focused, .choices__inner:focus {
@@ -80,10 +84,11 @@
         background-color: rgba(0,255,67,0.15) !important;
         border: 1px solid rgba(0,255,67,0.3) !important;
         color: var(--sb-text) !important;
-        border-radius: 0.65rem;
+        border-radius: 2px !important;
     }
     .choices__list--multiple .choices__item .choices__button {
-        border-left: 1px solid rgba(255,255,255,0.2) !important;
+        border-left: 1px solid rgba(255, 255, 255, 0.2) !important;
+        color: white
         margin: 0 -4px 0 8px;
     }
     .choices__list--dropdown .choices__item--selectable.is-highlighted {
@@ -221,7 +226,7 @@
         border: 1px solid rgba(0,255,67,0.2) !important;
         color: var(--sb-text) !important;
         padding: 15px;
-        border-radius: 0.85rem;
+        border-radius: 2px;
     }
 
     .sidebar-filters .card-body {
@@ -332,12 +337,17 @@
         margin-bottom: 2px;
     }
     .event-title-link {
-        font-weight: 600;
-        color: #FFFFFF !important;
+        font-weight: 700;
+        color: #F7F7F7 !important;
         text-decoration: none;
         font-size: 1rem;
         line-height: 1.2;
     }
+
+    .event-title-link:hover {
+        text-decoration: underline;
+    }
+
     .event-league {
         font-size: 0.75rem;
         color: #777;
@@ -356,6 +366,10 @@
         padding: 3px 10px;
         border-radius: 3px;
         gap: 10px;
+    }
+
+    #profit-filter:focus {
+         background: transparent;
     }
     .bkm-name { font-size: 0.7rem; color: #aaa; font-weight: bold; }
     .mkt-name { font-size: 0.7rem; color: #666; text-align: left; }
@@ -395,17 +409,6 @@
         color: var(--sb-accent) !important;
         background: rgba(0, 255, 67, 0.05) !important;
         transform: translateY(-1px);
-    }
-
-    /* O link do evento agora é apenas texto clicável para a casa */
-    .event-title-link {
-        font-weight: 600;
-        color: #FFFFFF !important;
-        text-decoration: none;
-        font-size: 0.95rem;
-    }
-    .event-title-link:hover {
-        text-decoration: underline;
     }
     </style>
 {% endblock stylesheets %}

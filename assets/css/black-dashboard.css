@@ -1402,7 +1402,6 @@ pre {
     border: 0; }
   .form-control:focus {
     color: rgba(255, 255, 255, 0.8);
-    background-color: #ffffff;
     border-color: rgba(50, 151, 211, 0.25);
     outline: 0;
     box-shadow: none, none; }
@@ -1419,7 +1418,6 @@ pre {
     color: #adb5bd;
     opacity: 1; }
   .form-control:disabled, .form-control[readonly] {
-    background-color: #e9ecef;
     opacity: 1; }
 
 .form-control option {
@@ -14077,7 +14075,7 @@ table.tablesorter thead tr .headerSortDown {
   width: 64px;
   background: rgba(0, 0, 0, 0.3);
   z-index: 1031;
-  border-radius: 8px 0 0 8px;
+  border-radius: 4px 0 0 8px;
   text-align: center;
   top: 130px; }
   .fixed-plugin li > a,
@@ -19112,7 +19110,7 @@ body.swal2-no-backdrop .swal2-shown.swal2-bottom-end, body.swal2-no-backdrop .sw
   width: 18px !important;
   height: 18px !important;
   margin: 0px -11px;
-  border-radius: 20px;
+  border-radius: 4px;
   position: absolute;
   float: left;
   top: 2px;
@@ -19843,7 +19841,7 @@ select.selectpicker {
     margin: 5px 3px 5px 0;
     position: relative;
     padding: 3px 8px;
-    border-radius: 12px;
+    border-radius: 4px;
     font-weight: 500;
     font-size: 0.75em;
     text-transform: uppercase;
@@ -19930,7 +19928,7 @@ select.selectpicker {
  */
 .ps__thumb-x {
   background-color: #aaa;
-  border-radius: 6px;
+  border-radius: 4px;
   transition: background-color .2s linear, height .2s ease-in-out;
   -webkit-transition: background-color .2s linear, height .2s ease-in-out;
   height: 6px;
@@ -19941,7 +19939,7 @@ select.selectpicker {
 
 .ps__thumb-y {
   background-color: #aaa;
-  border-radius: 6px;
+  border-radius: 4px;
   transition: background-color .2s linear, width .2s ease-in-out;
   -webkit-transition: background-color .2s linear, width .2s ease-in-out;
   width: 6px;
@@ -20274,7 +20272,7 @@ div.dt-autofill-list {
   width: 500px;
   margin-left: -250px;
   background-color: white;
-  border-radius: 6px;
+  border-radius: 4px;
   box-shadow: 0 0 5px #555;
   border: 2px solid #444;
   z-index: 11;

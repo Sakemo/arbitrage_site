@@ -6,7 +6,7 @@
     /* 1. ESTILO DA SIDEBAR (Visual) */
     .sidebar {
         background: #3C4045 !important;
-        width: 250px;
+        width: 90px;
         position: fixed;
         top: 0;
         bottom: 0;
@@ -90,8 +90,8 @@
     @media (min-width: 992px) {
         /* Garante que o conteúdo principal NÃO fique embaixo da sidebar */
         .main-panel {
-            width: calc(100% - 250px) !important; /* Subtrai a largura da sidebar */
-            margin-left: 250px !important;        /* Empurra o conteúdo para a direita */
+            width: calc(100% - 100px) !important; /* Subtrai a largura da sidebar */
+            margin-left: 100px !important;        /* Empurra o conteúdo para a direita */
             transition: all 0.3s cubic-bezier(0.685, 0.0473, 0.346, 1);
         }
         
@@ -117,7 +117,7 @@
             display: block !important;
             top: 0;
             height: 100%;
-            width: 260px;
+            width: 90px;
             right: auto;
             left: 0;
             z-index: 1032;
@@ -181,7 +181,7 @@
             <li class="{% if request.path == '/users' %}active{% endif %}">
                 <a href="{{ url_for('views.admin_users') }}">
                     <i class="tim-icons icon-single-02"></i>
-                    <p style="color: white;">Gerenciar Usuários</p>
+                    <p style="color: white;"></p>
                 </a>
             </li>
             {% endif %}
