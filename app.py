@@ -13,10 +13,5 @@ def calculadora():
 
 if __name__ == '__main__':
     import os
-    # Pega a porta do servidor, ou usa 8001 se estiver rodando local
-    port = int(os.environ.get("PORT", 8001))
-    
-    start_background_tasks(app, config)
-    
-    # IMPORTANTE: host="0.0.0.0" permite acesso externo
+    port = int(os.environ.get("PORT", 8000))
     socketio.run(app, host="0.0.0.0", port=port, debug=False, use_reloader=False)
