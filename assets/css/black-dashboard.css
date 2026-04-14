@@ -2786,6 +2786,7 @@ input[type="button"].btn-block {
   font-size: 0.875rem;
   font-weight: 400;
   line-height: 1.42857;
+  padding: 10px !important;
   color: #adb5bd;
   text-align: center;
   white-space: nowrap;
