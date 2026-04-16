@@ -278,11 +278,11 @@
     
     .sb-grid-layout {
     display: grid;
-    grid-template-columns: 100px 1fr 50px 320px;
+    grid-template-columns: 110px 1fr 50px 320px;
     align-items: center;
-    gap: 20px;
-    padding: 10px 20px;
-}
+    gap: 15px;
+    padding: 12px 20px;
+    }
 
     /* CABEÇALHO */
     .sb-list-header {
@@ -301,8 +301,10 @@
         margin-bottom: 6px;
         border-radius: 4px !important; /* Border radius reduzido */
         border: 1px solid var(--sb-border);
+        min-height: 80px;
         transition: all 0.2s;
     }
+
     .sb-list-row:hover {
         border-color: rgba(0,255,67,0.3);
         background: #363a3f !important;
@@ -311,12 +313,17 @@
     /* Coluna 1: Lucro */
     .sb-col-profit {
         text-align: left;
+        border-right: 1px solid rgba(255, 255, 255, 0.05);
     }
+
     .profit-badge {
         color: var(--sb-accent);
         font-weight: 800;
         font-size: 1.1rem;
-        line-height: 1;
+    }
+    .sb-col-event-info {
+        text-align: left;
+        overflow: hidden; /* Evita que texto gigante quebre o card */
     }
     .sport-label {
         font-size: 0.6rem;

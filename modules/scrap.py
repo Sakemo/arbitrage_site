@@ -10,6 +10,8 @@ from typing import List, Iterable
 import requests
 from .models import BettingOpportunity, db
 
+_KALSHI_EVENT_CACHE = {}
+
 # ================= MODELO DE DADOS =================
 @dataclass(frozen=True)
 class BetEntry:
@@ -39,6 +41,39 @@ def _parse_odd(value: str) -> float:
     try: return float(str(value).split()[0].replace(",", ".").strip())
     except: return 0.0
 
+def _extract_kalshi_price_cents(market: dict) -> float | None:
+    candidates = [
+        market.get("yes_bid"),
+        market.get("yes_ask"),
+        market.get("last_price"),
+    ]
+    for raw in candidates:
+        if raw is None or raw == "":
+            continue
+        try:
+            value = float(raw)
+        except (TypeError, ValueError):
+            continue
+        if 0 < value <= 100:
+            return value
+
+    dollar_candidates = [
+        market.get("yes_bid_dollars"),
+        market.get("yes_ask_dollars"),
+        market.get("last_price_dollars"),
+    ]
+    for raw in dollar_candidates:
+        if raw is None or raw == "":
+            continue
+        try:
+            value = float(raw) * 100
+        except (TypeError, ValueError):
+            continue
+        if value > 0:
+            return value
+
+    return None
+
 def _normalize_sport_name(val):
     v = str(val).strip()
     mapping = {
@@ -50,6 +85,146 @@ def _normalize_sport_name(val):
         "Weather": "Clima", "Science": "Ciência", "Technology": "Tecnologia"
     }
     return mapping.get(v, v)
+
+def _safe_log(message: str) -> None:
+    try:
+        print(str(message))
+    except UnicodeEncodeError:
+        print(str(message).encode("ascii", errors="ignore").decode("ascii"))
+
+def _fetch_kalshi_event(event_ticker: str, session: requests.Session) -> dict:
+    if not event_ticker:
+        return {}
+    if event_ticker in _KALSHI_EVENT_CACHE:
+        return _KALSHI_EVENT_CACHE[event_ticker]
+    if len(_KALSHI_EVENT_CACHE) > 2000:
+        _KALSHI_EVENT_CACHE.clear()
+    try:
+        url = f"https://api.elections.kalshi.com/trade-api/v2/events/{event_ticker}"
+        resp = session.get(url, timeout=10)
+        if resp.status_code != 200:
+            _KALSHI_EVENT_CACHE[event_ticker] = {}
+            return {}
+        event = resp.json().get("event", {}) or {}
+        _KALSHI_EVENT_CACHE[event_ticker] = event
+        return event
+    except Exception:
+        _KALSHI_EVENT_CACHE[event_ticker] = {}
+        return {}
+
+def _infer_kalshi_label_from_ticker(value: str) -> str | None:
+    raw = str(value or "").upper()
+    checks = [
+        ("WNBA", "WNBA"),
+        ("NBA", "NBA"),
+        ("MLB", "MLB"),
+        ("NHL", "NHL"),
+        ("NFL", "NFL"),
+        ("NCAAB", "NCAAB"),
+        ("NCAAF", "NCAAF"),
+        ("PGA", "Golfe"),
+        ("GOLF", "Golfe"),
+        ("ATP", "Tenis"),
+        ("WTA", "Tenis"),
+        ("TENNIS", "Tenis"),
+        ("UFC", "MMA"),
+        ("MMA", "MMA"),
+        ("SOCCER", "Futebol"),
+        ("MLS", "Futebol"),
+        ("EPL", "Futebol"),
+        ("UEFA", "Futebol"),
+        ("CRYPTO", "Cripto"),
+        ("BTC", "Cripto"),
+        ("ETH", "Cripto"),
+        ("WEATHER", "Clima"),
+        ("ECON", "Economia"),
+        ("RATE", "Economia"),
+        ("POLIT", "Politica"),
+        ("ELECTION", "Politica"),
+    ]
+    for needle, label in checks:
+        if needle in raw:
+            return label
+    return None
+
+def _split_kalshi_conditions(value: str) -> List[str]:
+    if not value:
+        return []
+    return [chunk.strip() for chunk in str(value).split(",") if chunk.strip()]
+
+def _clean_kalshi_condition(value: str) -> str:
+    text = str(value or "").strip()
+    lower = text.lower()
+    if lower.startswith("yes "):
+        text = text[4:]
+    elif lower.startswith("no "):
+        text = "No " + text[3:]
+    return text.replace(": ", " ", 1).strip()
+
+def _normalize_kalshi_event_title(value: str) -> str:
+    title = str(value or "").strip()
+    if ": " not in title:
+        return title
+    prefix, suffix = title.split(": ", 1)
+    simple_suffixes = {
+        "points", "rebounds", "assists", "hits", "goals",
+        "shots", "saves", "strikeouts", "passes", "yards"
+    }
+    return prefix if suffix.lower() in simple_suffixes else title
+
+def _build_kalshi_category(market: dict, event_meta: dict) -> str:
+    labels = set()
+    for leg in market.get("mve_selected_legs", []):
+        label = _infer_kalshi_label_from_ticker(leg.get("event_ticker") or leg.get("market_ticker"))
+        if label:
+            labels.add(label)
+    if len(labels) == 1:
+        return next(iter(labels))
+    if len(labels) > 1:
+        sports_labels = {"NBA", "WNBA", "MLB", "NHL", "NFL", "NCAAB", "NCAAF", "Golfe", "Tenis", "MMA", "Futebol"}
+        return "Multi-Sport" if labels.issubset(sports_labels) else "Multi-Category"
+    event_category = str(event_meta.get("category") or "").strip()
+    if event_category and event_category.lower() != "none":
+        return event_category
+    return "Prediction"
+
+def _build_kalshi_selection_summary(market: dict) -> str:
+    raw_conditions = _split_kalshi_conditions(market.get("yes_sub_title") or market.get("title"))
+    if not raw_conditions:
+        return "Mercado Kalshi"
+    cleaned = [_clean_kalshi_condition(item) for item in raw_conditions]
+    preview = ", ".join(cleaned[:2])
+    remaining = len(cleaned) - 2
+    if remaining > 0:
+        preview = f"{preview} +{remaining} mais"
+    return f"{len(cleaned)} selecoes: {preview}"
+
+def _build_kalshi_event_title(market: dict, event_meta: dict, session: requests.Session) -> str:
+    event_title = str(event_meta.get("title") or "").strip()
+    if event_title and event_title.lower() not in {"combo", "mve"}:
+        return event_title
+
+    leg_event_tickers = []
+    for leg in market.get("mve_selected_legs", []):
+        event_ticker = leg.get("event_ticker")
+        if event_ticker and event_ticker not in leg_event_tickers:
+            leg_event_tickers.append(event_ticker)
+
+    if leg_event_tickers:
+        first_child_event = _fetch_kalshi_event(leg_event_tickers[0], session)
+        first_child_title = _normalize_kalshi_event_title(first_child_event.get("title"))
+        if first_child_title:
+            extra_events = len(leg_event_tickers) - 1
+            if extra_events > 0:
+                suffix = "evento" if extra_events == 1 else "eventos"
+                return f"{first_child_title} + {extra_events} {suffix}"
+            return first_child_title
+
+    category = _build_kalshi_category(market, event_meta)
+    conditions_count = len(_split_kalshi_conditions(market.get("title") or market.get("yes_sub_title")))
+    if conditions_count > 0:
+        return f"Combo {category} ({conditions_count} selecoes)"
+    return f"Combo {category}"
 
 # ================= CREDENCIAIS =================
 def _load_betfair_credentials():
@@ -83,17 +258,22 @@ def _create_betfair_entry(market, market_book, sport_name) -> BetEntry:
 
     betfair_link = f"https://www.betfair.com.br/exchange/plus/market/{m_id}"
     betbra_link = f"https://www.bet-bra.com/exchange/plus/market/{m_id}"
+    pinnacle_link = "https://www.pinnacle.com/"
+    houses = ["Betfair", "Bet-Bra", "Pinnacle"]
+    links = [betfair_link, betbra_link, pinnacle_link]
     
     runners = market_book.get('runners', [])
     bks, sps, tms, evs, lks, lgs, mks, ods, lmt = [], [], [], [], [], [], [], [], []
 
-    for runner in runners[:3]:
+    for i, runner in enumerate(runners[:3]):
         p = runner.get('ex', {}).get('availableToBack', [])
         price = p[0]['price'] if p else 0
-        if price <= 1.01: continue
-        is_betbra = random.random() > 0.5
-        bks.append("Bet-Bra" if is_betbra else "Betfair")
-        lks.append(betbra_link if is_betbra else betfair_link)
+        if price <= 1.01:
+            continue
+        bookmaker = houses[i] if i < len(houses) else "Betfair"
+        link = links[i] if i < len(links) else betfair_link
+        bks.append(bookmaker)
+        lks.append(link)
         sps.append(sport_name)
         tms.append(dt_display)
         evs.append(event_name)
@@ -137,38 +317,62 @@ def get_kalshi_data() -> List[BetEntry]:
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
             "Accept": "application/json"
         }
-        resp = requests.get(url, headers=headers, timeout=15)
+        session = requests.Session()
+        session.headers.update(headers)
+        resp = session.get(url, timeout=15)
         if resp.status_code != 200:
-            print(f"⚠️ Kalshi API retornou status {resp.status_code}")
+            _safe_log(f"Kalshi API retornou status {resp.status_code}: {resp.text[:200]}")
             return []
         
-        markets = resp.json().get('markets', [])
+        data = resp.json()
+        markets = data.get('markets', [])
+        if not markets:
+            _safe_log("Kalshi API retornou markets vazio ou formato inesperado.")
         entries = []
         for m in markets:
-            # Tenta pegar yes_bid (centavos), se nulo tenta last_price
-            yes_cents = m.get('yes_bid') or m.get('last_price')
-            
-            # Se ainda nulo, tenta extrair de campos alternativos da V2
-            if not yes_cents:
-                yes_cents = m.get('yes_ask') # Pega o preço de venda se não houver de compra
-            
-            if not yes_cents or yes_cents <= 5 or yes_cents >= 95:
+            yes_cents = _extract_kalshi_price_cents(m)
+            if yes_cents is None:
                 continue
-            
-            # Cálculo de Odd Decimal (100 / centavos)
+            if yes_cents <= 5 or yes_cents >= 95:
+                continue
+            event_meta = _fetch_kalshi_event(m.get('event_ticker'), session)
+            category_label = _build_kalshi_category(m, event_meta)
+            event_title = _build_kalshi_event_title(m, event_meta, session)
+            selection_summary = _build_kalshi_selection_summary(m)
             odd_y = round(100 / yes_cents, 2)
             odd_n = round(100 / (100 - yes_cents), 2)
-            
             entries.append(BetEntry(
                 _generate_high_profit(), "real-api", ["Kalshi"]*2, 
-                [_normalize_sport_name(m.get('category'))]*2, [datetime.now().strftime("%H:%M")]*2,
-                [m.get('title')]*2, [f"https://kalshi.com/markets/{m['ticker']}"]*2,
-                [m.get('event_ticker', 'Prediction')]*2, ["YES", "NO"], 
+                [category_label]*2, [datetime.now().strftime("%H:%M")]*2,
+                [event_title]*2, [f"https://kalshi.com/markets/{m['ticker']}"]*2,
+                [selection_summary]*2, ["YES", "NO"], 
                 [str(odd_y), str(odd_n)], ["500","500"]
             ))
         return entries
     except Exception as e:
-        print(f"❌ Erro Kalshi V2: {e}")
+        _safe_log(f"Erro Kalshi V2: {e}")
+        return []
+
+def get_manifold_data() -> List[BetEntry]:
+    try:
+        url = "https://api.manifold.markets/v0/markets?limit=30&filter=open"
+        resp = requests.get(url, timeout=12).json()
+        entries = []
+        for m in resp:
+            prob = m.get('probability')
+            if prob is None or prob <= 0.05 or prob >= 0.95:
+                continue
+            odd_y = round(1 / prob, 2)
+            odd_n = round(1 / (1 - prob), 2)
+            entries.append(BetEntry(
+                _generate_high_profit(), "real-api", ["Manifold"] * 2, ["Social"] * 2,
+                [datetime.now().strftime("%H:%M")] * 2, [m.get('question')] * 2,
+                [m.get('url')] * 2, ["Manifold"] * 2, ["YES", "NO"],
+                [str(odd_y), str(odd_n)], ["200", "200"]
+            ))
+        return entries
+    except Exception as e:
+        _safe_log(f"Erro Manifold: {e}")
         return []
 
 # ================= MOTOR 3: POLYMARKET =================
@@ -237,17 +441,18 @@ def build_bet_data(bet: BetEntry) -> dict:
 
 # ================= LOOP PRINCIPAL =================
 async def start_scraping(app):
-    print("🚀 Scanner Multi-Broker Ativo | Betfair, Bet-Bra, Kalshi, Poly, PredictIt")
+    _safe_log("Scanner Multi-Broker Ativo | Betfair, Bet-Bra, Kalshi, Poly, PredictIt, Manifold")
     while True:
         try:
             tasks = [
                 asyncio.to_thread(aggregate_betfair_bets),
                 asyncio.to_thread(get_kalshi_data),
                 asyncio.to_thread(get_polymarket_data),
-                asyncio.to_thread(get_predictit_data)
+                asyncio.to_thread(get_predictit_data),
+                asyncio.to_thread(get_manifold_data)
             ]
             results = await asyncio.gather(*tasks)
-            all_entries = results[0] + results[1] + results[2] + results[3]
+            all_entries = results[0] + results[1] + results[2] + results[3] + results[4]
 
             with app.app_context():
                 db.session.query(BettingOpportunity).delete()
@@ -258,8 +463,11 @@ async def start_scraping(app):
                         BettingOpportunity.add_or_update(data)
                     except: continue
 
-            print(f"✅ Ciclo: {len(results[0])} BF/Bra | {len(results[1])} Kalshi | {len(results[2])} Poly | {len(results[3])} Predict")
+            _safe_log(
+                f"Ciclo: {len(results[0])} BF/Bra | {len(results[1])} Kalshi | "
+                f"{len(results[2])} Poly | {len(results[3])} Predict | {len(results[4])} Manifold"
+            )
         except Exception as e:
-            print(f"❌ Erro Crítico: {e}")
+            _safe_log(f"Erro Critico: {e}")
         
         await asyncio.sleep(60)

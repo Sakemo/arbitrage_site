@@ -14,4 +14,5 @@ def calculadora():
 if __name__ == '__main__':
     import os
     port = int(os.environ.get("PORT", 8000))
+    start_background_tasks(app, config)
     socketio.run(app, host="0.0.0.0", port=port, debug=False, use_reloader=False)
